@@ -1,0 +1,167 @@
+package ${bussiPackage}.${entityPackage}.controller;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import com.lst.common.api.vo.Result;
+import com.lst.common.util.oConvertUtils;
+import ${bussiPackage}.${entityPackage}.entity.${entityName};
+import ${bussiPackage}.${entityPackage}.service.I${entityName}Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+
+ /**
+ * @Title: Controller
+ * @Description: ${tableVo.ftlDescription}
+ * @author： lee
+ * @date：   ${.now?string["yyyy-MM-dd"]}
+ * @version： V1.0
+ */
+@RestController
+@RequestMapping("/${entityPackage}/${entityName?uncap_first}")
+@Slf4j
+@Api(tags="${tableVo.ftlDescription}")
+public class ${entityName}Controller {
+	@Autowired
+	private I${entityName}Service ${entityName?uncap_first}Service;
+	
+	/**
+	  * 分页列表查询
+	 * @param ${entityName?uncap_first}
+	 * @param pageNo
+	 * @param pageSize
+	 * @param req
+	 * @return
+	 */
+	@GetMapping(value = "/list")
+    @ApiOperation(value="${tableVo.ftlDescription}-分页列表查询", notes="${tableVo.ftlDescription}-分页列表查询")
+	public Result<IPage<${entityName}>> queryPageList(${entityName} ${entityName?uncap_first},
+									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+									  HttpServletRequest req) {
+		Result<IPage<${entityName}>> result = new Result<IPage<${entityName}>>();
+		QueryWrapper<${entityName}> queryWrapper = new QueryWrapper<${entityName}>(${entityName?uncap_first});
+		Page<${entityName}> page = new Page<${entityName}>(pageNo,pageSize);
+		//排序逻辑 处理
+		String column = req.getParameter("column");
+		String order = req.getParameter("order");
+		if(oConvertUtils.isNotEmpty(column) && oConvertUtils.isNotEmpty(order)) {
+			if("asc".equals(order)) {
+				queryWrapper.orderByAsc(oConvertUtils.camelToUnderline(column));
+			}else {
+				queryWrapper.orderByDesc(oConvertUtils.camelToUnderline(column));
+			}
+		}
+		IPage<${entityName}> pageList = ${entityName?uncap_first}Service.page(page, queryWrapper);
+		//log.debug("查询当前页："+pageList.getCurrent());
+		//log.debug("查询当前页数量："+pageList.getSize());
+		//log.debug("查询结果数量："+pageList.getRecords().size());
+		//log.debug("数据总数："+pageList.getTotal());
+		result.setSuccess(true);
+		result.setData(pageList);
+		return result;
+	}
+	
+	/**
+	  *   添加
+	 * @param ${entityName?uncap_first}
+	 * @return
+	 */
+	@PostMapping(value = "/add")
+    @ApiOperation(value="${tableVo.ftlDescription}-添加", notes="${tableVo.ftlDescription}-添加")
+	public Result add(@RequestBody ${entityName} ${entityName?uncap_first}) {
+		try {
+			${entityName?uncap_first}Service.save(${entityName?uncap_first});
+	    	return	Result.success("添加成功！");
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.info(e.getMessage());
+	    	return	Result.fail("数据已存在");
+		}
+	}
+	
+	/**
+	  *  编辑
+	 * @param ${entityName?uncap_first}
+	 * @return
+	 */
+    @ApiOperation(value="${tableVo.ftlDescription}-编辑", notes="${tableVo.ftlDescription}-编辑")
+    @PutMapping(value = "/edit")
+	public Result eidt(@RequestBody ${entityName} ${entityName?uncap_first}) {
+		${entityName} ${entityName?uncap_first}Entity = ${entityName?uncap_first}Service.getById(${entityName?uncap_first}.getId());
+		if(${entityName?uncap_first}Entity==null) {
+		     return	 Result.fail("未找到对应实体");
+		}else {
+			boolean ok = ${entityName?uncap_first}Service.updateById(${entityName?uncap_first});
+			//TODO 返回false说明什么？
+			if(ok) {
+			return	Result.success("修改成功!");
+			}
+			return	Result.fail("数据已存在");
+		}
+	}
+	
+	/**
+	  *   通过id删除
+	 * @param id
+	 * @return
+	 */
+    @ApiOperation(value="${tableVo.ftlDescription}-通过id删除", notes="${tableVo.ftlDescription}-通过id删除")
+	@DeleteMapping(value = "/delete")
+	public Result delete(@RequestParam(name="id",required=true) String id) {
+		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
+		if(${entityName?uncap_first}==null) {
+		     return	Result.fail("未找到对应实体");
+		}else {
+			boolean ok = ${entityName?uncap_first}Service.removeById(id);
+			if(ok) {
+			 return	Result.success("删除成功!");
+			}
+			 return	Result.fail("删除失败!");
+		}
+	}
+	
+	/**
+	  *  批量删除
+	 * @param ids
+	 * @return
+	 */
+    @ApiOperation(value="${tableVo.ftlDescription}-批量删除", notes="${tableVo.ftlDescription}-批量删除")
+	@DeleteMapping(value = "/deleteBatch")
+	public Result deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		if(ids==null || "".equals(ids.trim())) {
+		    return Result.fail("参数不识别！");
+		}else {
+			this.${entityName?uncap_first}Service.removeByIds(Arrays.asList(ids.split(",")));
+		    return Result.success("删除成功!");
+		}
+	}
+	
+	/**
+	  * 通过id查询
+	 * @param id
+	 * @return
+	 */
+    @ApiOperation(value="${tableVo.ftlDescription}-通过id查询", notes="${tableVo.ftlDescription}-通过id查询")
+	@GetMapping(value = "/queryById")
+	public Result<${entityName}> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<${entityName}> result = new Result<${entityName}>();
+		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
+		if(${entityName?uncap_first}==null) {
+			result.fail("未找到对应实体");
+		}else {
+			result.setData(${entityName?uncap_first});
+			result.setSuccess(true);
+		}
+		return result;
+	}
+
+}

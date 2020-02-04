@@ -1,0 +1,48 @@
+package ${bussiPackage}.${entityPackage}.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import cn.afterturn.easypoi.excel.annotation.Excel;
+
+/**
+ * @Description: ${tableVo.ftlDescription}
+ * @author： lee
+ * @date：   ${.now?string["yyyy-MM-dd"]}
+ * @version： V1.0
+ */
+@Data
+@TableName("${tableName}")
+public class ${entityName} implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    
+    <#list originalColumns as po>
+	<#if po.fieldName == tableId>
+	@TableId(type = IdType.UUID)
+	</#if>
+  <#if po.fieldType =='java.util.Date'>
+	<#if po.fieldDbType =='date'>
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+	<#elseif po.fieldDbType =='datetime'>
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "${po.filedComment}", width = 20, format = "yyyy-MM-dd HH:mm:ss")
+	</#if>
+  <#else>
+    @Excel(name = "${po.filedComment}", width = 15)
+  </#if>
+  <#--    swagger注解-->
+    @ApiModelProperty(value = "${po.filedComment}")
+	private <#if po.fieldType=='java.sql.Blob'>byte[]<#else>${po.fieldType}</#if> ${po.fieldName};
+
+	</#list>
+}
