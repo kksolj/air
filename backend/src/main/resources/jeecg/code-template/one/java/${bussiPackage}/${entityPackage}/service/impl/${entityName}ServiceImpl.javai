@@ -16,4 +16,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 @Service
 public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, ${entityName}> implements I${entityName}Service {
 
+    @Override
+    public void importExcel(List<${entityName}> ${entityName}List) {
+        for (${entityName} enter : ${entityName}List) {
+            ${entityName}Mapper.saveOrUpdate(enter);
+        }
+    }
 }

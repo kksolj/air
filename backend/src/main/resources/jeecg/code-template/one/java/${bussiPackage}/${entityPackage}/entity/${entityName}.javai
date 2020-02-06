@@ -23,7 +23,7 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 public class ${entityName} implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     <#list originalColumns as po>
 	<#if po.fieldName == tableId>
 	@TableId(type = IdType.UUID)
@@ -40,7 +40,6 @@ public class ${entityName} implements Serializable {
   <#else>
     @Excel(name = "${po.filedComment}", width = 15)
   </#if>
-  <#--    swagger注解-->
     @ApiModelProperty(value = "${po.filedComment}")
 	private <#if po.fieldType=='java.sql.Blob'>byte[]<#else>${po.fieldType}</#if> ${po.fieldName};
 

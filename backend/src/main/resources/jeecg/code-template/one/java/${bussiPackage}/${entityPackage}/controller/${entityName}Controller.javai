@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import com.lst.common.api.vo.Result;
-import com.lst.common.util.oConvertUtils;
+import com.air.common.api.vo.Result;
+import com.air.common.util.oConvertUtils;
+import com.air.common.util.ExcelUtils;
 import ${bussiPackage}.${entityPackage}.entity.${entityName};
 import ${bussiPackage}.${entityPackage}.service.I${entityName}Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,9 @@ import io.swagger.annotations.ApiOperation;
 public class ${entityName}Controller {
 	@Autowired
 	private I${entityName}Service ${entityName?uncap_first}Service;
-	
+
 	/**
-	  * 分页列表查询
+	 * 分页列表查询
 	 * @param ${entityName?uncap_first}
 	 * @param pageNo
 	 * @param pageSize
@@ -69,9 +70,9 @@ public class ${entityName}Controller {
 		result.setData(pageList);
 		return result;
 	}
-	
+
 	/**
-	  *   添加
+	 *   添加
 	 * @param ${entityName?uncap_first}
 	 * @return
 	 */
@@ -87,9 +88,9 @@ public class ${entityName}Controller {
 	    	return	Result.fail("数据已存在");
 		}
 	}
-	
+
 	/**
-	  *  编辑
+	 *  编辑
 	 * @param ${entityName?uncap_first}
 	 * @return
 	 */
@@ -108,9 +109,9 @@ public class ${entityName}Controller {
 			return	Result.fail("数据已存在");
 		}
 	}
-	
+
 	/**
-	  *   通过id删除
+	 *   通过id删除
 	 * @param id
 	 * @return
 	 */
@@ -128,9 +129,9 @@ public class ${entityName}Controller {
 			 return	Result.fail("删除失败!");
 		}
 	}
-	
+
 	/**
-	  *  批量删除
+	 *  批量删除
 	 * @param ids
 	 * @return
 	 */
@@ -144,9 +145,9 @@ public class ${entityName}Controller {
 		    return Result.success("删除成功!");
 		}
 	}
-	
+
 	/**
-	  * 通过id查询
+	 * 通过id查询
 	 * @param id
 	 * @return
 	 */
@@ -163,5 +164,31 @@ public class ${entityName}Controller {
 		}
 		return result;
 	}
+
+    /**
+    * 通过excel导入数据
+    *
+    * @param request
+    * @param response
+    * @return
+    */
+    @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
+    @RequestMapping(value = "importExcel")
+    public void importExcel(@RequestParam("file") MultipartFile file) {
+        List<${entityName}>  ${entityName}List = ExcelUtils.importExcel(file, 0, 1, ${entityName}.class);
+        ${entityName}Service.importExcel(${entityName}List);
+    }
+
+    /**
+    * 导出excel
+    *
+    * @param request
+    * @param ${entityName?uncap_first}
+    */
+    @RequestMapping(value = "/exportExcel")
+    public void exportExcel(HttpServletResponse response) {
+        List<${entityName}> ${entityName}List = ${entityName?uncap_first}Service.getAll();
+        ExcelUtils.exportExcel(${entityName}List, null, "${tableVo.ftlDescription}", ${entityName}.class, "${tableVo.ftlDescription}.xls", true, response);
+    }
 
 }
