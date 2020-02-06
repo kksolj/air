@@ -87,9 +87,9 @@ public class MyRealm extends AuthorizingRealm {
 		 */
 		info.setRoles(new HashSet<>(roles));
 
-		// TODO 测试数据
-		String permissions = "sys:role:update2,sys:role:add,/sys/user/add";
-		Set<String> permission = new HashSet<>(Arrays.asList(permissions.split(",")));
+//		// TODO 测试数据
+//		String permissions = "sys:role:update2,sys:role:add,/sys/user/add";
+//		Set<String> permission = new HashSet<>(Arrays.asList(permissions.split(",")));
 
 		// 从数据库获取所有的权限
 		Set<String> permissionSet = new HashSet<>();

@@ -71,8 +71,6 @@ public class LoginController {
 			obj.put("token", token);
 			obj.put("userInfo", sysUser);
 
-			//全局上下文设置下ID  这里没有完全解决多租户问题
-			apiContext.setCurrentStoreId(sysUser.getStoreId());
 			sysBaseAPI.addLog("用户名: "+username+",登录成功！", CommonConstant.LOG_TYPE_1, null);
 			return Result.success(obj);
 		}

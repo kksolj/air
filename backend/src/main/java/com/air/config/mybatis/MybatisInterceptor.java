@@ -1,33 +1,34 @@
 package com.air.config.mybatis;
 
-import com.air.common.util.oConvertUtils;
-import com.air.config.ApiContext;
-import com.air.modules.system.entity.SysUser;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.binding.MapperMethod.ParamMap;
-import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.*;
-import org.apache.shiro.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.Properties;
 
+import com.air.common.util.oConvertUtils;
+import com.air.modules.system.entity.SysUser;
+import org.apache.ibatis.binding.MapperMethod.ParamMap;
+import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
+import org.apache.shiro.SecurityUtils;
+import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * mybatis拦截器，自动注入创建人、创建时间、修改人、修改时间
- * @author lee
+ * @author zgs
  *
  */
 @Slf4j
 @Component
 @Intercepts({ @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }) })
 public class MybatisInterceptor implements Interceptor {
-    @Autowired
-	private ApiContext apiContext;
 
 	@Override
 	public Object intercept(Invocation invocation) throws Throwable {
@@ -51,7 +52,7 @@ public class MybatisInterceptor implements Interceptor {
 						Object local_createBy = field.get(parameter);
 						field.setAccessible(false);
 						if (local_createBy == null || local_createBy.equals("")) {
-							String createBy = "k_boot";
+							String createBy = "jx_boot";
 							// 获取登录用户信息
 							SysUser sysUser = (SysUser) SecurityUtils.getSubject().getPrincipal();
 							if (sysUser != null) {
@@ -76,13 +77,6 @@ public class MybatisInterceptor implements Interceptor {
 							field.setAccessible(false);
 						}
 					}
-
-//					// 注入门店id
-//					if ("storeId".equals(field.getName())) {
-//						field.setAccessible(true);
-//						field.set(parameter, apiContext.getCurrentStoreId());
-//						field.setAccessible(false);
-//					}
 				} catch (Exception e) {
 				}
 			}
@@ -105,7 +99,7 @@ public class MybatisInterceptor implements Interceptor {
 						Object local_updateBy = field.get(parameter);
 						field.setAccessible(false);
 						if (local_updateBy == null || local_updateBy.equals("")) {
-							String updateBy = "k_boot";
+							String updateBy = "jx_boot";
 							// 获取登录用户信息
 							SysUser sysUser = (SysUser) SecurityUtils.getSubject().getPrincipal();
 							if (sysUser != null) {

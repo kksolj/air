@@ -91,7 +91,7 @@ spring:
 
 #mybatis plus 设置
 mybatis-plus:
-   mapper-locations: classpath*:com/lst/modules/**/xml/*Mapper.xml
+   mapper-locations: classpath*:com/air/modules/**/xml/*Mapper.xml
    global-config:
      banner: false
 

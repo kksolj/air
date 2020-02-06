@@ -53,16 +53,13 @@ public class SysPermissionController {
 	public Result list() {
 
 		try {
-
 			LambdaQueryWrapper<SysPermission> query = new LambdaQueryWrapper<SysPermission>();
 			query.eq(SysPermission::getIsDeleted, 0);
 			query.orderByAsc(SysPermission::getSortNo);
 			List<SysPermission> list = sysPermissionService.list(query);
 			List<SysPermissionTree> treeList = new ArrayList<>();
 			getTreeList(treeList, list, null);
-
 			return Result.success(treeList);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Result.fail(e.getMessage());
@@ -97,7 +94,6 @@ public class SysPermissionController {
 	public Result add(@RequestBody SysPermission permission, HttpServletRequest request) {
 
 		try {
-
 			String userId = JwtUtil.getUserToken(request, "userId");
 			sysPermissionService.addPermission(permission, userId);
 			return Result.success("添加成功！");

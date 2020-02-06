@@ -16,8 +16,8 @@ import com.air.common.util.oConvertUtils;
  **/
 public class JwtUtil {
 
-	// 过期时间30分钟
-	public static final long EXPIRE_TIME = 30 * 60 * 1000;
+	// 过期时间24小時
+	public static final long EXPIRE_TIME = 60 * 60 * 1000 * 24;
 
 	/**
 	 * 校验token是否正确

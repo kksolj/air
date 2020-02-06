@@ -75,10 +75,6 @@ public class SysUser implements Serializable {
      */
     private String phone;
 
-    /**
-     * 门店id
-     */
-    private String storeId;
 
     /**
      * 状态(1：正常  2：冻结 ）
