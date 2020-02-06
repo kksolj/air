@@ -13,7 +13,7 @@
     props: {
       title: {
         type: String,
-        default: '零售通',
+        default: 'AIR',
         required: false
       },
       showTitle: {

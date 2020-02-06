@@ -41,7 +41,7 @@ public interface CommonConstant {
 
     String PREFIX_USER_ROLE = "PREFIX_USER_ROLE";
     String PREFIX_USER_PERMISSION  = "PREFIX_USER_PERMISSION ";
-    int TOKEN_EXPIRE_TIME  = 3600;
+    int TOKEN_EXPIRE_TIME  = 3600*24*60;
 
     String PREFIX_USER_TOKEN  = "PREFIX_USER_TOKEN ";
 

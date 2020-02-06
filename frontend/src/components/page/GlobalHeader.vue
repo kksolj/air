@@ -12,7 +12,7 @@
         class="trigger"
         :type="collapsed ? 'menu-unfold' : 'menu-fold'"
         @click.native="toggle"/>
-      <span>欢迎进入 翼商户 零售通</span>
+      <span>欢迎进入本系统</span>
       <user-menu></user-menu>
     </div>
     <div v-else :class="['top-nav-header-index', theme]">

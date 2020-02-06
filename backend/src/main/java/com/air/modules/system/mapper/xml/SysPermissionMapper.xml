@@ -32,7 +32,7 @@
 			JOIN sys_role b ON a.role_id = b.id
 			JOIN sys_user_role c ON c.role_id = b.id
 			JOIN sys_user d ON d.id = c.user_id
-			WHERE p.id = a.permission_id AND d.login_name = #{username,jdbcType=VARCHAR}
+			WHERE p.id = a.permission_id AND d.username = #{username,jdbcType=VARCHAR}
 		)
 		AND p.is_deleted = 0
 		ORDER BY p.sort_no ASC

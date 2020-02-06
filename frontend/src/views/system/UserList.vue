@@ -183,14 +183,14 @@
         queryParam: {},
         columns: [
           {
-            title: '用户账号',
+            title: '登陆名',
             align: 'center',
             dataIndex: 'loginName',
             fixed: 'left',
             width: 200
           },
           {
-            title: '真实姓名',
+            title: '账户名',
             align: 'center',
             dataIndex: 'username',
           },

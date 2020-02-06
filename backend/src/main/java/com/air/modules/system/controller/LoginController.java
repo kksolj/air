@@ -41,13 +41,24 @@ public class LoginController {
 	@Autowired
 	private ApiContext apiContext;
 
+	@RequestMapping(value = "/loginOut", method = RequestMethod.POST)
+	@ApiOperation("退出登陆")
+	public Result loginOut(@RequestBody SysLoginModel sysLoginModel) {
+		String token = "";
+		redisUtil.del(token);
+		return  Result.success("退出成功");
+	}
+
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@ApiOperation("登录接口")
 	public Result login(@RequestBody SysLoginModel sysLoginModel) {
-		//redis取出判断 没有
+
 		String username = sysLoginModel.getUsername();
 		String password = sysLoginModel.getPassword();
+
+		//redis取出判断 未完善
+
 		SysUser sysUser = sysUserService.getUserByName(username);
 		if (sysUser == null) {
 			sysBaseAPI.addLog("登录失败，用户名:"+username+"不存在！", CommonConstant.LOG_TYPE_1, null);

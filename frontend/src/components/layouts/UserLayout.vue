@@ -8,7 +8,7 @@
           </a>
         </div>
         <div class="desc">
-        翼商户（零售通）
+         AIR
         </div>
       </div>
 

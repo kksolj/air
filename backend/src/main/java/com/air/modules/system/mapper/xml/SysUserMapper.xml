@@ -4,6 +4,6 @@
 
 	<!-- 根据用户名查询 -->
 	<select id="getUserByName" resultType="com.air.modules.system.entity.SysUser">
-		select * from  sys_user where login_name = #{username}
+		select * from  sys_user where username = #{username}
 	</select>
 </mapper>
