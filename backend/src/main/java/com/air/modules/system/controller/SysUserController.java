@@ -16,6 +16,8 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import com.air.common.api.vo.Result;
 import com.air.common.util.PasswordUtil;
 import com.air.common.util.oConvertUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +45,8 @@ public class SysUserController {
 
 	@Autowired
 	private ISysUserRoleService sysUserRoleService;
+
+	private Logger log= LoggerFactory.getLogger(SysUserController.class);
 
 	@GetMapping("/list")
 	public Result queryPageList(SysUser user,
@@ -160,7 +164,9 @@ public class SysUserController {
 			String[] arr = ids.split(",");
 			for (String id : arr) {
 				if (oConvertUtils.isNotEmpty(id)) {
-					this.sysUserService.update(new SysUser().setStatus(Integer.parseInt(status)),
+					SysUser tempUser=new SysUser();
+					tempUser.setStatus(Integer.parseInt(status));
+					this.sysUserService.update(tempUser,
 							new UpdateWrapper<SysUser>().lambda().eq(SysUser::getId,id));
 				}
 			}
