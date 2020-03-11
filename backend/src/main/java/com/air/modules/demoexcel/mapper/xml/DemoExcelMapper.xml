@@ -8,10 +8,9 @@
         <result property="age" column="age"/>
         <result property="address" column="address"/>
         <result property="updateTime" column="update_time"/>
-        <result property="createTime" column="create_time"/>
     </resultMap>
 
     <select id="getAll" resultMap="BaseMap">
-        select id,name,sex,age,address,update_time,create_time from t_excel;
+        select id,name,sex,age,address,update_time from t_excel;
     </select>
 </mapper>

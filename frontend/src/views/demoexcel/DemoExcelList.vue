@@ -42,18 +42,19 @@
 
     <!-- 报表导入导出功能 -->
     <div>
-      <label>导出至Excel文件</label>
-      <a-button @click="exportExcel">导出</a-button>
+      <a-button type="primary" @click="exportExcel">导出Excel文件</a-button>
     </div>
+
     <div>
-      <a-form enctype="multipart/form-data">
-        <label>导入Excel文件</label>
-        <a-input
-          type="file"
-          accept=".xls,.xlsx"
-          @change="getFile($event)"/>
-        <a-button @click="importExcel($event)">上传</a-button>
-      </a-form>
+      <a-upload
+        name="file"
+        :multiple="false"
+        :action="uploadAction"
+        :headers="headers"
+        @change="handleChange"
+        :show-upload-list="false">
+        <a-button> <a-icon type="upload" /> 导入Excel文件 </a-button>
+      </a-upload>
     </div>
 
     <!-- table区域-begin -->
@@ -104,7 +105,11 @@
   import DemoExcelModal from './modules/DemoExcelModal'
   import { filterObj } from '@/utils/util'
   import { deleteAction,getAction } from '@/api/manage'
-  import { downFile,uploadFile } from '@/api/manage'
+  import { downFile } from '@/api/manage'
+  import Vue from 'vue'
+  import { ACCESS_TOKEN } from "@/store/mutation-types"
+  import {doMian} from '@/api/api'
+
 
   export default {
     name: "DemoExcelList",
@@ -149,11 +154,6 @@
             dataIndex: 'address'
           },
           {
-              title: '创建时间',
-              align:"center",
-              dataIndex: 'createTime'
-          },
-          {
             title: '操作',
             dataIndex: 'action',
             align:"center",
@@ -186,13 +186,20 @@
           delete: "/demoexcel/demoExcel/delete",
           deleteBatch: "/demoexcel/demoExcel/deleteBatch",
           downfile: "/demoexcel/demoExcel/exportExcel",
-          uploadFile: "/demoexcel/demoExcel/importExcel"
+          uploadFile: doMian + "/demoexcel/demoExcel/importExcel"
         },
-        
+        headers: {}
       }
     },
     created() {
       this.loadData();
+      const token = Vue.ls.get(ACCESS_TOKEN);
+      this.headers = {"X-Access-Token":token}
+    },
+    computed: {
+        uploadAction: function () {
+            return this.url.uploadFile;
+        }
     },
     methods: {
       loadData (arg){
@@ -321,22 +328,22 @@
                       document.body.removeChild(link) //移除元素
                       window.URL.revokeObjectURL(url) //释放blob对象
                   }
-              })
-      },
-      importExcel: function(event){
-          //报表导入
-          event.preventDefault();
-          let formData=new FormData();
-          formData.append('file',this.file);
-          uploadFile(this.url.uploadFile,"POST",formData)
-              .then((res)=>{
-                  console.log(res)
               },(res)=>{
                   console.log(res)
-              });
+                  this.$message.warning('下载失败!')
+                  return
+              })
       },
-      getFile (event) {
-          this.file=event.target.files[0];
+
+      handleChange(info) {
+          if (info.file.status !== 'uploading') {
+              console.log(info.file, info.fileList);
+          }
+          if (info.file.status === 'done') {
+                this.$message.success('文件上传成功!')
+          } else if (info.file.status === 'error') {
+                this.$message.warning('文件上传失败!')
+          }
       }
     }
   }
