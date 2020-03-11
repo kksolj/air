@@ -830,6 +830,25 @@ INSERT INTO `sys_user_role` (`id`, `user_id`, `role_id`) VALUES
 	('007d3c216736fcf8ab9f0bb6aaa5b3b4', 'e9ca23d68d884d4ebb19d07889727dae', 'f6817f48af4fb3af11b9e8bf182f618b');
 /*!40000 ALTER TABLE `sys_user_role` ENABLE KEYS */;
 
+-- 导出  表 air.t_excel 结构
+CREATE TABLE IF NOT EXISTS `t_excel` (
+  `id` varchar(32) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `sex` varchar(255) DEFAULT NULL,
+  `age` tinyint(3) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `create_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 正在导出表  air.t_excel 的数据：~2 rows (大约)
+/*!40000 ALTER TABLE `t_excel` DISABLE KEYS */;
+INSERT INTO `t_excel` (`id`, `name`, `sex`, `age`, `address`, `update_time`, `create_time`) VALUES
+	('1bc2a14743fae1e1c9c86fa4531821e2', '毛毛', '男', 22, '动物园1楼', NULL, '2020-03-11 15:52:48'),
+	('e55bdb5c173d943af133246a50fa3c09', '哈利', '女', 30, '动物园2楼', NULL, '2020-03-11 15:52:48');
+/*!40000 ALTER TABLE `t_excel` ENABLE KEYS */;
+
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
