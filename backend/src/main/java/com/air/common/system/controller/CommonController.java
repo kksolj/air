@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.air.common.api.vo.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.FileCopyUtils;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.HandlerMapping;
 
 import lombok.extern.slf4j.Slf4j;
+import sun.rmi.runtime.Log;
 
 /**
  * 文件上传
@@ -34,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/sys/common")
 public class CommonController {
+
+	private Logger log= LoggerFactory.getLogger(CommonController.class);
 
 	@Value(value = "${uploadpath}")
 	private String uploadpath;

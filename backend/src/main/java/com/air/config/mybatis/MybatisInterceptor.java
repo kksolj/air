@@ -16,6 +16,8 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.shiro.SecurityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Intercepts({ @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class }) })
 public class MybatisInterceptor implements Interceptor {
+
+	private Logger log= LoggerFactory.getLogger(MybatisInterceptor.class);
 
 	@Override
 	public Object intercept(Invocation invocation) throws Throwable {

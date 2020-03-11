@@ -101,4 +101,131 @@ public class SysLog implements Serializable {
 	 */
 	private Integer operateType;
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getCreateBy() {
+		return createBy;
+	}
+
+	public void setCreateBy(String createBy) {
+		this.createBy = createBy;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public String getUpdateBy() {
+		return updateBy;
+	}
+
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public Long getCostTime() {
+		return costTime;
+	}
+
+	public void setCostTime(Long costTime) {
+		this.costTime = costTime;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getRequestParam() {
+		return requestParam;
+	}
+
+	public void setRequestParam(String requestParam) {
+		this.requestParam = requestParam;
+	}
+
+	public String getRequestType() {
+		return requestType;
+	}
+
+	public void setRequestType(String requestType) {
+		this.requestType = requestType;
+	}
+
+	public String getRequestUrl() {
+		return requestUrl;
+	}
+
+	public void setRequestUrl(String requestUrl) {
+		this.requestUrl = requestUrl;
+	}
+
+	public String getMethod() {
+		return method;
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getUserid() {
+		return userid;
+	}
+
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+
+	public String getLogContent() {
+		return logContent;
+	}
+
+	public void setLogContent(String logContent) {
+		this.logContent = logContent;
+	}
+
+	public Integer getLogType() {
+		return logType;
+	}
+
+	public void setLogType(Integer logType) {
+		this.logType = logType;
+	}
+
+	public Integer getOperateType() {
+		return operateType;
+	}
+
+	public void setOperateType(Integer operateType) {
+		this.operateType = operateType;
+	}
 }

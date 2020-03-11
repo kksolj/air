@@ -97,3 +97,25 @@ export function saveService(parameter) {
   })
 }
 
+export function downFile(url,method){
+  return axios({
+    url: url,
+    method: method,
+    responseType: 'blob',
+    headers: {
+      'Content-Type':'multipart/form-data'
+    }
+  })
+}
+
+export function uploadFile(url,method,data) {
+  return axios({
+    url: url,
+    method: method,
+    data: data,
+    headers: {
+      'Content-Type':'multipart/form-data,charset=utf-8,boundary=none',
+      'Content-Disposition':'attachment;filename=test.xls;name=import-excel'
+    }
+  })
+}

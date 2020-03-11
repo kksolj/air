@@ -2,6 +2,8 @@ package com.air.common.exception;
 
 import com.air.common.api.vo.Result;
 import org.apache.shiro.authz.AuthorizationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 @Slf4j
 public class ServiceExceptionHandler {
+
+	private Logger log= LoggerFactory.getLogger(ServiceExceptionHandler.class);
 
 	/**
 	 * 处理自定义异常

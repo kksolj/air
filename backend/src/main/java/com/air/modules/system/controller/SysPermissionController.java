@@ -20,6 +20,8 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import com.air.common.api.vo.Result;
 import com.air.common.util.MD5Util;
 import com.air.common.util.oConvertUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +47,7 @@ public class SysPermissionController {
 	@Autowired
 	private ISysRolePermissionService sysRolePermissionService;
 
+	private Logger log= LoggerFactory.getLogger(SysPermissionController.class);
 	/**
 	 * 加载数据节点
 	 * @return

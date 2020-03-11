@@ -63,6 +63,8 @@ public class ShiroConfig {
 
 		filterChainDefinitionMap.put("/processInstance/**", "anon");
 		filterChainDefinitionMap.put("/task/**", "anon");
+		//报表导入导出
+		filterChainDefinitionMap.put("/demoexcel/**", "anon");
 
 		//自动代码生成器
 		filterChainDefinitionMap.put("/autoCode/makeBySql", "anon");

@@ -40,9 +40,7 @@ export const asyncRouterMap = [
             name: 'log',
             component: () => import('@/views/system/LogList'),
             meta: { title: '日志管理', permission: [ 'dashboard' ] }
-          },
-
-
+          }
         ]
       },
 
@@ -128,7 +126,22 @@ export const asyncRouterMap = [
         ]
       },
 
-
+      // 报表导入导出
+      {
+        path: '/excel',
+        name: 'excel',
+        redirect: '/excel/demo',
+        component: RouteView,
+        meta: { title: '报表导入导出', icon: 'excel', permission: [ 'excel' ] },
+        children: [
+          {
+            path: '/excel/demo',
+            name: 'Demo',
+            component: () => import('@/views/demoexcel/DemoExcelList'),
+            meta: { title: '报表页', permission: [ 'excel' ] }
+          }
+        ]
+      }
     ]
   },
   {

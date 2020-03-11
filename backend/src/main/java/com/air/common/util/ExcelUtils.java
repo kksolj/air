@@ -29,6 +29,7 @@ public class ExcelUtils {
         defaultExport(list, pojoClass, fileName, response, new ExportParams(title, sheetName));
     }
     public static void exportExcel(List<Map<String, Object>> list, String fileName, HttpServletResponse response){
+        //TODO test
         defaultExport(list, fileName, response);
     }
 
@@ -46,6 +47,7 @@ public class ExcelUtils {
                     "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
             workbook.write(response.getOutputStream());
         } catch (IOException e) {
+            e.printStackTrace();
             /*throw new NormalException(e.getMessage());*/
         }
     }

@@ -6,15 +6,16 @@
       <a-form layout="inline">
         <a-row :gutter="24">
 
-<#list columns as po>
-<#if po.fieldName !='id' && po_index<= tableVo.searchFieldNum>
           <a-col :span="6">
-            <a-form-item label="${po.filedComment}">
-              <a-input placeholder="请输入${po.filedComment}" v-model="queryParam.${po.fieldName}"></a-input>
+            <a-form-item label="姓名">
+              <a-input placeholder="请输入姓名" v-model="queryParam.name"></a-input>
             </a-form-item>
           </a-col>
-</#if>
-</#list>
+          <a-col :span="6">
+            <a-form-item label="性别">
+              <a-input placeholder="请输入性别" v-model="queryParam.sex"></a-input>
+            </a-form-item>
+          </a-col>
 
           <a-col :span="8" >
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
@@ -95,24 +96,24 @@
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <${entityName?uncap_first}-modal ref="${entityName?uncap_first}Modal" @ok="modalFormOk"></${entityName?uncap_first}-modal>
+    <demoExcel-modal ref="demoExcelModal" @ok="modalFormOk"></demoExcel-modal>
   </a-card>
 </template>
 
 <script>
-  import ${entityName}Modal from './modules/${entityName}Modal'
+  import DemoExcelModal from './modules/DemoExcelModal'
   import { filterObj } from '@/utils/util'
   import { deleteAction,getAction } from '@/api/manage'
   import { downFile,uploadFile } from '@/api/manage'
 
   export default {
-    name: "${entityName}List",
+    name: "DemoExcelList",
     components: {
-      ${entityName}Modal
+      DemoExcelModal
     },
     data () {
       return {
-        description: '${tableVo.ftlDescription}管理页面',
+        description: '管理页面',
         // 查询条件
         queryParam: {},
         // 表头
@@ -127,15 +128,31 @@
               return parseInt(index)+1;
             }
           },
-          <#list columns as po>
-           <#if po.fieldName !='id'>
 		  {
-            title: '${po.filedComment}',
+            title: '姓名',
             align:"center",
-            dataIndex: '${po.fieldName}'
+            dataIndex: 'name'
           },
-		   </#if>
-		  </#list>
+		  {
+            title: '性别',
+            align:"center",
+            dataIndex: 'sex'
+          },
+		  {
+            title: '年龄',
+            align:"center",
+            dataIndex: 'age'
+          },
+		  {
+            title: '地址',
+            align:"center",
+            dataIndex: 'address'
+          },
+          {
+              title: '创建时间',
+              align:"center",
+              dataIndex: 'createTime'
+          },
           {
             title: '操作',
             dataIndex: 'action',
@@ -165,11 +182,11 @@
         selectedRowKeys: [],
         selectedRows: [],
 		url: {
-          list: "/${entityPackage}/${entityName?uncap_first}/list",
-          delete: "/${entityPackage}/${entityName?uncap_first}/delete",
-          deleteBatch: "/${entityPackage}/${entityName?uncap_first}/deleteBatch",
-          downfile: "/${entityPackage}/${entityName?uncap_first}/exportExcel",
-          uploadFile: "/${entityPackage}/${entityName?uncap_first}/importExcel"
+          list: "/demoexcel/demoExcel/list",
+          delete: "/demoexcel/demoExcel/delete",
+          deleteBatch: "/demoexcel/demoExcel/deleteBatch",
+          downfile: "/demoexcel/demoExcel/exportExcel",
+          uploadFile: "/demoexcel/demoExcel/importExcel"
         },
         
       }
@@ -261,12 +278,12 @@
         });
       },
       handleEdit: function(record){
-        this.$refs.${entityName?uncap_first}Modal.edit(record);
-        this.$refs.${entityName?uncap_first}Modal.title="编辑";
+        this.$refs.demoExcelModal.edit(record);
+        this.$refs.demoExcelModal.title="编辑";
       },
       handleAdd: function(){
-        this.$refs.${entityName?uncap_first}Modal.add();
-        this.$refs.${entityName?uncap_first}Modal.title="新增";
+        this.$refs.demoExcelModal.add();
+        this.$refs.demoExcelModal.title="新增";
       },
       handleTableChange(pagination, filters, sorter){
         //分页、排序、筛选变化时触发
@@ -315,7 +332,6 @@
               .then((res)=>{
                   console.log(res)
               },(res)=>{
-                  this.$message.warning('文件上传失败!')
                   console.log(res)
               });
       },

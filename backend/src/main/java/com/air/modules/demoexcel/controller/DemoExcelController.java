@@ -1,4 +1,4 @@
-package ${bussiPackage}.${entityPackage}.controller;
+package com.air.modules.demoexcel.controller;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.air.common.api.vo.Result;
 import com.air.common.util.oConvertUtils;
 import com.air.common.util.ExcelUtils;
-import ${bussiPackage}.${entityPackage}.entity.${entityName};
-import ${bussiPackage}.${entityPackage}.service.I${entityName}Service;
+import com.air.modules.demoexcel.entity.DemoExcel;
+import com.air.modules.demoexcel.service.IDemoExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,38 +24,38 @@ import org.springframework.web.multipart.MultipartFile;
 
  /**
  * @Title: Controller
- * @Description: ${tableVo.ftlDescription}
+ * @Description: 
  * @author： lee
- * @date：   ${.now?string["yyyy-MM-dd"]}
+ * @date：   2020-03-11
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/${entityPackage}/${entityName?uncap_first}")
+@RequestMapping("/demoexcel/demoExcel")
 @Slf4j
-@Api(tags="${tableVo.ftlDescription}")
-public class ${entityName}Controller {
+@Api(tags="")
+public class DemoExcelController {
 	@Autowired
-	private I${entityName}Service ${entityName?uncap_first}Service;
+	private IDemoExcelService demoExcelService;
 
-	private Logger log= LoggerFactory.getLogger(${entityName}Controller.class);
+	private Logger log= LoggerFactory.getLogger(DemoExcelController.class);
 
 	/**
 	 * 分页列表查询
-	 * @param ${entityName?uncap_first}
+	 * @param demoExcel
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-    @ApiOperation(value="${tableVo.ftlDescription}-分页列表查询", notes="${tableVo.ftlDescription}-分页列表查询")
-	public Result<IPage<${entityName}>> queryPageList(${entityName} ${entityName?uncap_first},
+    @ApiOperation(value="-分页列表查询", notes="-分页列表查询")
+	public Result<IPage<DemoExcel>> queryPageList(DemoExcel demoExcel,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<${entityName}>> result = new Result<IPage<${entityName}>>();
-		QueryWrapper<${entityName}> queryWrapper = new QueryWrapper<${entityName}>(${entityName?uncap_first});
-		Page<${entityName}> page = new Page<${entityName}>(pageNo,pageSize);
+		Result<IPage<DemoExcel>> result = new Result<IPage<DemoExcel>>();
+		QueryWrapper<DemoExcel> queryWrapper = new QueryWrapper<DemoExcel>(demoExcel);
+		Page<DemoExcel> page = new Page<DemoExcel>(pageNo,pageSize);
 		//排序逻辑 处理
 		String column = req.getParameter("column");
 		String order = req.getParameter("order");
@@ -66,7 +66,7 @@ public class ${entityName}Controller {
 				queryWrapper.orderByDesc(oConvertUtils.camelToUnderline(column));
 			}
 		}
-		IPage<${entityName}> pageList = ${entityName?uncap_first}Service.page(page, queryWrapper);
+		IPage<DemoExcel> pageList = demoExcelService.page(page, queryWrapper);
 		//log.debug("查询当前页："+pageList.getCurrent());
 		//log.debug("查询当前页数量："+pageList.getSize());
 		//log.debug("查询结果数量："+pageList.getRecords().size());
@@ -78,14 +78,14 @@ public class ${entityName}Controller {
 
 	/**
 	 *   添加
-	 * @param ${entityName?uncap_first}
+	 * @param demoExcel
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-    @ApiOperation(value="${tableVo.ftlDescription}-添加", notes="${tableVo.ftlDescription}-添加")
-	public Result add(@RequestBody ${entityName} ${entityName?uncap_first}) {
+    @ApiOperation(value="-添加", notes="-添加")
+	public Result add(@RequestBody DemoExcel demoExcel) {
 		try {
-			${entityName?uncap_first}Service.save(${entityName?uncap_first});
+			demoExcelService.save(demoExcel);
 	    	return	Result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -96,17 +96,17 @@ public class ${entityName}Controller {
 
 	/**
 	 *  编辑
-	 * @param ${entityName?uncap_first}
+	 * @param demoExcel
 	 * @return
 	 */
-    @ApiOperation(value="${tableVo.ftlDescription}-编辑", notes="${tableVo.ftlDescription}-编辑")
+    @ApiOperation(value="-编辑", notes="-编辑")
     @PutMapping(value = "/edit")
-	public Result eidt(@RequestBody ${entityName} ${entityName?uncap_first}) {
-		${entityName} ${entityName?uncap_first}Entity = ${entityName?uncap_first}Service.getById(${entityName?uncap_first}.getId());
-		if(${entityName?uncap_first}Entity==null) {
+	public Result eidt(@RequestBody DemoExcel demoExcel) {
+		DemoExcel demoExcelEntity = demoExcelService.getById(demoExcel.getId());
+		if(demoExcelEntity==null) {
 		     return	 Result.fail("未找到对应实体");
 		}else {
-			boolean ok = ${entityName?uncap_first}Service.updateById(${entityName?uncap_first});
+			boolean ok = demoExcelService.updateById(demoExcel);
 			//TODO 返回false说明什么？
 			if(ok) {
 			return	Result.success("修改成功!");
@@ -120,14 +120,14 @@ public class ${entityName}Controller {
 	 * @param id
 	 * @return
 	 */
-    @ApiOperation(value="${tableVo.ftlDescription}-通过id删除", notes="${tableVo.ftlDescription}-通过id删除")
+    @ApiOperation(value="-通过id删除", notes="-通过id删除")
 	@DeleteMapping(value = "/delete")
 	public Result delete(@RequestParam(name="id",required=true) String id) {
-		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
-		if(${entityName?uncap_first}==null) {
+		DemoExcel demoExcel = demoExcelService.getById(id);
+		if(demoExcel==null) {
 		     return	Result.fail("未找到对应实体");
 		}else {
-			boolean ok = ${entityName?uncap_first}Service.removeById(id);
+			boolean ok = demoExcelService.removeById(id);
 			if(ok) {
 			 return	Result.success("删除成功!");
 			}
@@ -140,13 +140,13 @@ public class ${entityName}Controller {
 	 * @param ids
 	 * @return
 	 */
-    @ApiOperation(value="${tableVo.ftlDescription}-批量删除", notes="${tableVo.ftlDescription}-批量删除")
+    @ApiOperation(value="-批量删除", notes="-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		if(ids==null || "".equals(ids.trim())) {
 		    return Result.fail("参数不识别！");
 		}else {
-			this.${entityName?uncap_first}Service.removeByIds(Arrays.asList(ids.split(",")));
+			this.demoExcelService.removeByIds(Arrays.asList(ids.split(",")));
 		    return Result.success("删除成功!");
 		}
 	}
@@ -156,15 +156,15 @@ public class ${entityName}Controller {
 	 * @param id
 	 * @return
 	 */
-    @ApiOperation(value="${tableVo.ftlDescription}-通过id查询", notes="${tableVo.ftlDescription}-通过id查询")
+    @ApiOperation(value="-通过id查询", notes="-通过id查询")
 	@GetMapping(value = "/queryById")
-	public Result<${entityName}> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<${entityName}> result = new Result<${entityName}>();
-		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
-		if(${entityName?uncap_first}==null) {
+	public Result<DemoExcel> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<DemoExcel> result = new Result<DemoExcel>();
+		DemoExcel demoExcel = demoExcelService.getById(id);
+		if(demoExcel==null) {
 			result.fail("未找到对应实体");
 		}else {
-			result.setData(${entityName?uncap_first});
+			result.setData(demoExcel);
 			result.setSuccess(true);
 		}
 		return result;
@@ -178,8 +178,8 @@ public class ${entityName}Controller {
     */
     @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
     public void importExcel(@RequestParam("file") MultipartFile file) {
-        List<${entityName}>  ${entityName?uncap_first}List = ExcelUtils.importExcel(file, 0, 1, ${entityName}.class);
-        ${entityName?uncap_first}Service.importExcel(${entityName?uncap_first}List);
+        List<DemoExcel>  demoExcelList = ExcelUtils.importExcel(file, 0, 1, DemoExcel.class);
+        demoExcelService.importExcel(demoExcelList);
     }
 
     /**
@@ -189,8 +189,8 @@ public class ${entityName}Controller {
     */
     @RequestMapping(value = "/exportExcel")
     public void exportExcel(HttpServletResponse response) {
-        List<${entityName}> ${entityName?uncap_first}List = ${entityName?uncap_first}Service.getAll();
-        ExcelUtils.exportExcel(${entityName?uncap_first}List, null, "${tableVo.ftlDescription}", ${entityName}.class, "${tableVo.ftlDescription}.xls", true, response);
+        List<DemoExcel> demoExcelList = demoExcelService.getAll();
+        ExcelUtils.exportExcel(demoExcelList, null, "", DemoExcel.class, ".xls", true, response);
     }
 
 }

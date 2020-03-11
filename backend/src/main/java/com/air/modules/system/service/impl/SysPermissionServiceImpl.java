@@ -47,7 +47,9 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 		int count = this.count(new QueryWrapper<SysPermission>().lambda().eq(SysPermission::getParentId, pid));
 		if(count==1) {
 			//若父节点无其他子节点，则该父节点是叶子节点
-			this.update(new SysPermission().setIsLeaf(1),new UpdateWrapper<SysPermission>().eq("id",pid));
+			SysPermission tmpPer=new SysPermission();
+			tmpPer.setIsLeaf(1);
+			this.update(tmpPer,new UpdateWrapper<SysPermission>().eq("id",pid));
 		}
 		sysPermissionMapper.deleteById(id);
 	}
@@ -65,7 +67,9 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 		int count = this.count(new QueryWrapper<SysPermission>().lambda().eq(SysPermission::getParentId, pid));
 		if(count==1) {
 			//若父节点无其他子节点，则该父节点是叶子节点
-			this.update(new SysPermission().setIsLeaf(1),new UpdateWrapper<SysPermission>().eq("id",pid));
+			SysPermission tmpPer=new SysPermission();
+			tmpPer.setIsLeaf(1);
+			this.update(tmpPer,new UpdateWrapper<SysPermission>().eq("id",pid));
 		}
 		sysPermission.setIsDeleted("1");
 		this.updateById(sysPermission);
@@ -82,7 +86,9 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 		String pid = sysPermission.getParentId();
 		if(oConvertUtils.isNotEmpty(pid)) {
 			//设置父节点不为叶子节点
-			this.update(new SysPermission().setIsLeaf(0),new UpdateWrapper<SysPermission>().eq("id",pid));
+			SysPermission tmpPer=new SysPermission();
+			tmpPer.setIsLeaf(0);
+			this.update(tmpPer,new UpdateWrapper<SysPermission>().eq("id",pid));
 		}
 		sysPermission.setCreateTime(new Date());
 		sysPermission.setCreateBy(userId);
@@ -112,7 +118,9 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 			String pid = sysPermission.getParentId();
 			if(oConvertUtils.isNotEmpty(pid) && !pid.equals(p.getParentId())) {
 				//设置父节点不为叶子节点
-				this.update(new SysPermission().setIsLeaf(0),new UpdateWrapper<SysPermission>().eq("id",pid));
+				SysPermission tmpPer=new SysPermission();
+				tmpPer.setIsLeaf(0);
+				this.update(tmpPer,new UpdateWrapper<SysPermission>().eq("id",pid));
 			}
 		}
 
