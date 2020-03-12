@@ -1,5 +1,6 @@
 package com.air.modules.system.controller;
 
+import com.air.common.util.IdWorker;
 import com.alibaba.fastjson.JSONObject;
 import com.air.common.api.vo.Result;
 import com.air.common.constant.CommonConstant;
@@ -73,6 +74,10 @@ public class LoginController {
 			String userId = sysUser.getId();
 
 			//生成token
+			//TODO CK=>用snowflake重新计算token
+			IdWorker idWorker=new IdWorker(1,1,1);
+			Long ckt=idWorker.nextId();
+
 			String token = JwtUtil.sign(userId, username, sysPassword);
 			redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, token);
 			 //设置超时时间

@@ -9,6 +9,8 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 鉴权请求URL访问权限拦截器
@@ -27,6 +29,7 @@ public class ResourceCheckFilter extends AccessControlFilter {
         this.errorUrl = errorUrl;
     }
 
+    private Logger log= LoggerFactory.getLogger(ResourceCheckFilter.class);
 
     /**
      * 表示是否允许访问 ，如果允许访问返回true，否则false；
