@@ -5,12 +5,12 @@ import org.apache.shiro.authc.AuthenticationToken;
 /**
  * @author lee
  **/
-public class JwtToken implements AuthenticationToken {
+public class MyToken implements AuthenticationToken {
 
 	private static final long serialVersionUID = 1L;
 	private String token;
 
-    public JwtToken(String token) {
+    public MyToken(String token) {
         this.token = token;
     }
 

@@ -14,9 +14,12 @@ import { axios } from '@/utils/request'
  */
 export function login(parameter) {
   return axios({
-    url: '/sys/login',
+    url: api.Login,
     method: 'post',
-    data: parameter
+    data: parameter,
+    headers: {
+      'X-Access-Token': parameter.token
+    }
   })
 }
 
@@ -38,11 +41,12 @@ export function getInfo() {
   })
 }
 
-export function logout() {
+export function logout(token) {
   return axios({
-    url: '/api/auth/logout',
+    url: api.Logout,
     method: 'post',
     headers: {
+      'X-Access-Token': token,
       'Content-Type': 'application/json;charset=UTF-8'
     }
   })

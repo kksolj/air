@@ -1,7 +1,6 @@
 package com.air.config;
 
 import com.air.modules.shiro.authc.MyRealm;
-import com.air.modules.shiro.authc.aop.JwtFilter;
 import com.air.modules.shiro.authc.aop.ResourceCheckFilter;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
@@ -47,7 +46,7 @@ public class ShiroConfig {
 		//图片预览不限制token
 		filterChainDefinitionMap.put("/sys/common/view/**", "anon");
 		//退出登录
-		filterChainDefinitionMap.put("/api/auth/logout", "anon");
+		filterChainDefinitionMap.put("/sys/logout", "anon");
 		//退出登录
 		filterChainDefinitionMap.put("/auth/2step-code", "anon");
 
@@ -84,11 +83,9 @@ public class ShiroConfig {
 
 		// 添加自己的过滤器并且取名为jwt
 		Map<String, Filter> filterMap = new HashMap<String, Filter>(1);
-		filterMap.put("jwt", new JwtFilter());
 		filterMap.put("resourceCheckFilter", new ResourceCheckFilter());
 		shiroFilterFactoryBean.setFilters(filterMap);
 		// <!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边
-		filterChainDefinitionMap.put("/**", "jwt");
 		//filterChainDefinitionMap.put("/**", "resourceCheckFilter");
 
 		// 未授权界面;

@@ -1,14 +1,18 @@
 package com.air.common.util;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 /**
  * 雪花算法生成token
+ * @author ck
  */
-public class IdWorker {
+public class TokenGenerator {
     private long workerId;//机器id
     private long datacenterId;//机房id
     private long sequence;//请求序号
 
-    public IdWorker(long workerId, long datacenterId, long sequence){
+    public TokenGenerator(long workerId, long datacenterId, long sequence){
         // sanity check for workerId
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0",maxWorkerId));
@@ -90,9 +94,9 @@ public class IdWorker {
 
     //---------------测试---------------
     public static void main(String[] args) {
-        IdWorker worker = new IdWorker(1,1,2);
+        TokenGenerator generator = new TokenGenerator(1,1,2);
         for (int i = 0; i < 30; i++) {
-            System.out.println(worker.nextId());
+            System.out.println(generator.nextId());
         }
     }
 }

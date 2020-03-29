@@ -80,13 +80,14 @@ const user = {
     },
 
     // 登出
-    Logout({ commit, state }) {
+    Logout({ commit,state }) {
       return new Promise((resolve) => {
+        let originToken = state.token
         commit('SET_TOKEN', '')
         commit('SET_PERMISSIONLIST', [])
         Vue.ls.remove(ACCESS_TOKEN)
 
-        logout(state.token).then(() => {
+        logout(originToken).then(() => {
           resolve()
         }).catch(() => {
           resolve()

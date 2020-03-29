@@ -1,28 +1,28 @@
 package com.air.config;
 
-import java.lang.reflect.Method;
-
-import javax.annotation.Resource;
+import com.air.common.util.TokenGenerator;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 
 @Configuration
-@EnableCaching // 开启缓存支持
-public class RedisConfig extends CachingConfigurerSupport {
+public class RedisCacheConfig extends CachingConfigurerSupport {
 
-	@Resource
+	@Autowired
 	private LettuceConnectionFactory lettuceConnectionFactory;
 
 	/**
@@ -32,27 +32,22 @@ public class RedisConfig extends CachingConfigurerSupport {
 	 */
 	@Bean
 	public KeyGenerator keyGenerator() {
-		return new KeyGenerator() {
-			@Override
-			public Object generate(Object target, Method method, Object... params) {
-				StringBuffer sb = new StringBuffer();
-				sb.append(target.getClass().getName());
-				sb.append(method.getName());
-				for (Object obj : params) {
-					sb.append(obj.toString());
-				}
-				return sb.toString();
-			}
-		};
+		return (target, method, params) -> new TokenGenerator(1,1,1).nextId();
 	}
 
 	// 这个注释不能放开，发现自定义缓存管理器，会导致实体解析失败
-	//TODO
-//	@Bean
-//	public CacheManager cacheManager() {
-//		RedisCacheManager.RedisCacheManagerBuilder builder = RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(lettuceConnectionFactory);
-//		return builder.build();
-//	}
+	@Bean
+	public RedisCacheManager redisCacheManager() {
+		RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(lettuceConnectionFactory);
+
+		RedisCacheConfiguration configuration = RedisCacheConfiguration
+				.defaultCacheConfig()
+				.disableCachingNullValues();
+
+		RedisCacheManager redisCacheManager = new RedisCacheManager(cacheWriter, configuration);
+
+		return redisCacheManager;
+	}
 
 	/**
 	 * RedisTemplate配置

@@ -1,12 +1,12 @@
 package com.air.modules.shiro.authc;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.air.modules.shiro.authc.util.JwtUtil;
+import com.alibaba.druid.util.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -22,6 +22,8 @@ import com.air.modules.system.entity.SysPermission;
 import com.air.modules.system.entity.SysUser;
 import com.air.modules.system.service.ISysPermissionService;
 import com.air.modules.system.service.ISysUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -46,12 +48,14 @@ public class MyRealm extends AuthorizingRealm {
     @Autowired
     private RedisUtil redisUtil;
 
+    private Logger log= LoggerFactory.getLogger(MyRealm.class);
+
 	/**
 	 * 必须重写此方法，不然Shiro会报错
 	 */
 	@Override
 	public boolean supports(AuthenticationToken token) {
-		return token instanceof JwtToken;
+		return token instanceof MyToken;
 	}
 
 	/**
@@ -119,25 +123,13 @@ public class MyRealm extends AuthorizingRealm {
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken auth) throws AuthenticationException {
 		log.debug("————身份认证方法————");
 		String token = (String) auth.getCredentials();
-		if (token == null) {
+		if (StringUtils.isEmpty(token)) {
 			throw new AuthenticationException("token为空!");
 		}
-		// 解密获得username，用于和数据库进行对比
-		String userId = JwtUtil.getTokenInfo(token, "userId");
-		String userName = JwtUtil.getTokenInfo(token, "username");
-		if (userId == null) {
-			throw new AuthenticationException("token非法无效!");
-		}
-
-		// 查询用户信息
-		SysUser sysUser = sysUserService.getById(userId);
+		//对比redis中数据进行校验
+		SysUser sysUser = (SysUser)redisUtil.get(token);
 		if (sysUser == null) {
-			throw new AuthenticationException("用户不存在!");
-		}
-
-		//校验token是否超时失效 & 或者账号密码是否错误
-		if (!jwtTokenRefresh(token, userId, userName, sysUser.getPassword())) {
-			throw new AuthenticationException("用户名或密码错误!");
+			throw new AuthenticationException("token非法无效，请重新登录!");
 		}
 
 		// 判断用户状态

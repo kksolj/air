@@ -1,26 +1,13 @@
 package com.air.modules.system.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.air.common.api.vo.Result;
+import com.air.common.util.PasswordUtil;
+import com.air.common.util.oConvertUtils;
 import com.air.modules.shiro.authc.util.JwtUtil;
 import com.air.modules.system.entity.SysUser;
 import com.air.modules.system.entity.SysUserRole;
 import com.air.modules.system.service.ISysUserRoleService;
 import com.air.modules.system.service.ISysUserService;
-import org.apache.shiro.authz.annotation.RequiresRoles;
-import com.air.common.api.vo.Result;
-import com.air.common.util.PasswordUtil;
-import com.air.common.util.oConvertUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,8 +15,18 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 用户 Controller

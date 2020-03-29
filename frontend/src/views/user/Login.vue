@@ -118,7 +118,7 @@
       }
     },
     created () {
-      Vue.ls.remove(ACCESS_TOKEN)
+      // Vue.ls.remove(ACCESS_TOKEN)
       // update-begin- --- author:scott ------ date:20190225 ---- for:暂时注释，未实现登录验证码功能
 //      this.$http.get('/auth/2step-code')
 //        .then(res => {
@@ -128,7 +128,7 @@
 //        })
       // update-end- --- author:scott ------ date:20190225 ---- for:暂时注释，未实现登录验证码功能
      // this.requiredTwoStepCaptcha = true
-      
+
     },
     methods: {
       ...mapActions([ "Login", "Logout" ]),
@@ -160,8 +160,8 @@
             if (!err) {
               flag = true
               loginParams[!that.loginType ? 'email' : 'username'] = values.username
-              //loginParams.password = md5(values.password)
               loginParams.password = values.password
+              loginParams.token = Vue.ls.get(ACCESS_TOKEN)
             }
           })
         // 使用手机号登陆

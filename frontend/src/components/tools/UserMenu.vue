@@ -55,7 +55,7 @@
           title: '提示',
           content: '真的要注销登录吗 ?',
           onOk() {
-            return that.Logout({}).then(() => {
+            return that.Logout().then(() => {
               window.location.reload()
             }).catch(err => {
               that.$message.error({
