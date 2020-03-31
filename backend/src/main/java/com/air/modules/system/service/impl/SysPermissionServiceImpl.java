@@ -1,22 +1,22 @@
 package com.air.modules.system.service.impl;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import com.air.common.constant.CommonConstant;
+import com.air.common.exception.ServiceException;
+import com.air.common.util.oConvertUtils;
 import com.air.modules.system.entity.SysPermission;
 import com.air.modules.system.mapper.SysPermissionMapper;
 import com.air.modules.system.model.TreeModel;
 import com.air.modules.system.service.ISysPermissionService;
-import com.air.common.constant.CommonConstant;
-import com.air.common.exception.ServiceException;
-import com.air.common.util.oConvertUtils;
-import org.springframework.stereotype.Service;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 菜单权限表 服务实现类
@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  * @author lee
  */
 @Service
+@CacheConfig(cacheNames = "syspermission")
 public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, SysPermission> implements ISysPermissionService {
 
 	@Resource
@@ -127,8 +128,10 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 	}
 
 	@Override
+	@Cacheable(key = "#username")
 	public List<SysPermission> queryByUser(String username) {
-		return this.sysPermissionMapper.queryByUser(username);
+		List<SysPermission> list=this.sysPermissionMapper.queryByUser(username);
+		return list;
 	}
 
 }

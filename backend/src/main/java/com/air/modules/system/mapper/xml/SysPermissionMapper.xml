@@ -10,6 +10,28 @@
 		<result column="leaf_flag" property="isLeaf" jdbcType="INTEGER"/>
 	</resultMap>
 
+	<resultMap id="permissionList" type="com.air.modules.system.entity.SysPermission" >
+		<result column="id" property="id" jdbcType="VARCHAR"/>
+		<result column="parent_id" property="parentId" jdbcType="VARCHAR"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="url" property="url" jdbcType="VARCHAR"/>
+		<result column="component" property="component" jdbcType="VARCHAR"/>
+		<result column="redirect" property="redirect" jdbcType="VARCHAR"/>
+		<result column="menu_type" property="menuType" jdbcType="INTEGER"/>
+		<result column="perms" property="perms" jdbcType="VARCHAR"/>
+		<result column="sort_no" property="sortNo" jdbcType="DOUBLE"/>
+		<result column="always_show" property="alwaysShow" jdbcType="INTEGER"/>
+		<result column="icon" property="icon" jdbcType="VARCHAR"/>
+		<result column="is_leaf" property="isLeaf" jdbcType="INTEGER"/>
+		<result column="hidden" property="hidden" jdbcType="INTEGER"/>
+		<result column="description" property="description" jdbcType="VARCHAR"/>
+		<result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="DATE"/>
+		<result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="DATE"/>
+		<result column="is_deleted" property="isDeleted" jdbcType="VARCHAR"/>
+	</resultMap>
+
 	<select id="queryListByParentId" parameterType="Object"  resultMap="TreeModel">
         SELECT id,parent_id,name,icon,leaf_flag
 	    FROM sys_permission
@@ -24,8 +46,27 @@
 		</choose>
 	</select>
 
-	<select id="queryByUser" parameterType="Object"  resultType="com.air.modules.system.entity.SysPermission">
-		SELECT p.*
+	<select id="queryByUser" parameterType="Object"  resultMap="permissionList">
+		SELECT
+		p.id,
+		p.parent_id,
+		p.name,
+		p.url,
+		p.component,
+		p.redirect,
+		p.menu_type,
+		p.perms,
+		p.sort_no,
+		p.always_show,
+		p.icon,
+		p.is_leaf,
+		p.hidden,
+		p.description,
+		p.create_by,
+		p.create_time,
+		p.update_by,
+		p.update_time,
+		p.is_deleted
 		FROM  sys_permission p
 		WHERE EXISTS(
 			SELECT a.id FROM sys_role_permission a

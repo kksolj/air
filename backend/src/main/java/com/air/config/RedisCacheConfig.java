@@ -16,6 +16,7 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -39,11 +40,19 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
 	@Bean
 	public RedisCacheManager redisCacheManager() {
 		RedisCacheWriter cacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(lettuceConnectionFactory);
+		// 设置序列化
+		Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
+		ObjectMapper om = new ObjectMapper();
+		om.setVisibility(PropertyAccessor.ALL, Visibility.ANY);
+		om.enableDefaultTyping(DefaultTyping.NON_FINAL);
+		jackson2JsonRedisSerializer.setObjectMapper(om);
+		StringRedisSerializer stringRedisSerializer=new StringRedisSerializer();
 
 		RedisCacheConfiguration configuration = RedisCacheConfiguration
 				.defaultCacheConfig()
-				.disableCachingNullValues();
-
+				.disableCachingNullValues()
+				.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(stringRedisSerializer))
+				.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer));
 		RedisCacheManager redisCacheManager = new RedisCacheManager(cacheWriter, configuration);
 
 		return redisCacheManager;

@@ -87,6 +87,12 @@ spring:
        shutdown-timeout: 100ms
      port: 6379
      password: ''
+  #cache 配置
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000 #缓存生命周期(ms)
+    cache-names: cache,syspermission
 
 
 #mybatis plus 设置

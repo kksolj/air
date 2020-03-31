@@ -1,12 +1,11 @@
 package com.air.modules.system.mapper;
 
-import java.util.List;
-
 import com.air.modules.system.entity.SysPermission;
 import com.air.modules.system.model.TreeModel;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.util.List;
 
 /**
  * <p>
@@ -17,11 +16,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SysPermissionMapper extends BaseMapper<SysPermission> {
 
-	List<TreeModel> queryListByParentId(@Param("parentId") String parentId);
+    List<TreeModel> queryListByParentId(@Param("parentId") String parentId);
 
-	/**
-	  *   根据用户查询用户权限
-	 */
-	List<SysPermission> queryByUser(@Param("username") String username);
+    /**
+     * 根据用户查询用户权限
+     */
+    List<SysPermission> queryByUser(@Param("username") String username);
 
 }
