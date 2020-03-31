@@ -10,12 +10,10 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import com.air.modules.shiro.authc.util.JwtUtil;
-import com.air.modules.system.entity.CacheDemo;
 import com.air.modules.system.entity.SysPermission;
 import com.air.modules.system.entity.SysRolePermission;
 import com.air.modules.system.model.SysPermissionTree;
 import com.air.modules.system.model.TreeModel;
-import com.air.modules.system.service.ICacheDemoService;
 import com.air.modules.system.service.ISysPermissionService;
 import com.air.modules.system.service.ISysRolePermissionService;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -48,9 +46,6 @@ public class SysPermissionController {
 
 	@Autowired
 	private ISysRolePermissionService sysRolePermissionService;
-
-	@Autowired
-	private ICacheDemoService cacheDemoService;
 
 	private Logger log= LoggerFactory.getLogger(SysPermissionController.class);
 	/**
@@ -85,7 +80,6 @@ public class SysPermissionController {
 		try {
 			String username = req.getParameter("username");
 			List<SysPermission> metaList = sysPermissionService.queryByUser(username);
-			List<CacheDemo> demos = cacheDemoService.readCacheDemo(String.valueOf(43362346L));
 			JSONArray jsonArray = new JSONArray();
 			this.getPermissionJsonArray(jsonArray, metaList, null);
 			return Result.success(jsonArray);

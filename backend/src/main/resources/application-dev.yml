@@ -92,7 +92,7 @@ spring:
     type: redis
     redis:
       time-to-live: 600000 #缓存生命周期(ms)
-    cache-names: cache,syspermission
+    cache-names: permission,role,userrole
 
 
 #mybatis plus 设置

@@ -1,18 +1,20 @@
 package com.air.modules.system.service.impl;
 
-import java.util.List;
-
 import com.air.common.util.IdGen;
+import com.air.common.util.oConvertUtils;
 import com.air.modules.system.entity.SysUser;
 import com.air.modules.system.entity.SysUserRole;
 import com.air.modules.system.mapper.SysUserMapper;
 import com.air.modules.system.mapper.SysUserRoleMapper;
 import com.air.modules.system.service.ISysUserService;
-import com.air.common.util.oConvertUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 用户表 服务实现类
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
  * @author lee
  */
 @Service
+@CacheConfig
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
 
 	@Autowired
@@ -65,6 +68,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 
 	@Override
+	@Cacheable(key ="userrole",value = "#username")
 	public List<String> getRole(String username) {
 		return sysUserRoleMapper.getRoleByUserName(username);
 	}

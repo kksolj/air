@@ -2,6 +2,7 @@ package com.air.modules.system.service.impl;
 
 import com.air.common.constant.CommonConstant;
 import com.air.common.exception.ServiceException;
+import com.air.common.util.RedisUtil;
 import com.air.common.util.oConvertUtils;
 import com.air.modules.system.entity.SysPermission;
 import com.air.modules.system.mapper.SysPermissionMapper;
@@ -10,6 +11,7 @@ import com.air.modules.system.service.ISysPermissionService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ import java.util.List;
  * @author lee
  */
 @Service
-@CacheConfig(cacheNames = "syspermission")
+@CacheConfig(cacheNames = "permission")
 public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, SysPermission> implements ISysPermissionService {
 
 	@Resource
