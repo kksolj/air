@@ -5,8 +5,12 @@ import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import com.air.common.util.RedisUtil;
+import com.air.modules.shiro.authc.util.AuthorizedUtil;
 import com.air.modules.shiro.authc.util.JwtUtil;
+import com.air.modules.shiro.vo.DefContants;
 import com.air.modules.system.entity.SysRole;
+import com.air.modules.system.entity.SysUser;
 import com.air.modules.system.service.ISysRoleService;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import com.air.common.api.vo.Result;
@@ -29,6 +33,9 @@ public class SysRoleController {
 
 	@Autowired
 	private ISysRoleService sysRoleService;
+
+	@Autowired
+	private AuthorizedUtil authorizedUtil;
 
 	/**
 	  * 分页列表查询
@@ -71,16 +78,12 @@ public class SysRoleController {
 	public Result add(@RequestBody SysRole role, HttpServletRequest request) {
 
 		try {
-
-			String userId = JwtUtil.getUserToken(request, "userId");
-
-			role.setCreateBy(userId);
+			SysUser user = authorizedUtil.getUser(request);
+			role.setCreateBy(user.getId());
 			role.setCreateTime(new Date());
 			sysRoleService.save(role);
 			return Result.success("添加成功！");
-
 		} catch (Exception e) {
-
 			e.printStackTrace();
 			return Result.fail("操作失败");
 		}
@@ -95,22 +98,25 @@ public class SysRoleController {
 	@RequiresRoles({"admin"})
 	public Result edit(@RequestBody SysRole role, HttpServletRequest request) {
 
-		SysRole sysrole = sysRoleService.getById(role.getId());
-		if (sysrole == null) {
-			return Result.fail("未找到对应实体");
-		} else {
-
-			String userId = JwtUtil.getUserToken(request, "userId");
-			role.setUpdateBy(userId);
-			role.setUpdateTime(new Date());
-
-			boolean ok = sysRoleService.updateById(role);
-			if (ok) {
-				return Result.success("修改成功！");
+		try{
+			SysRole sysrole = sysRoleService.getById(role.getId());
+			if (sysrole == null) {
+				return Result.fail("未找到对应实体");
+			} else {
+				SysUser user = authorizedUtil.getUser(request);
+				String userId = user.getId();
+				role.setUpdateBy(userId);
+				role.setUpdateTime(new Date());
+				boolean ok = sysRoleService.updateById(role);
+				if (ok) {
+					return Result.success("修改成功！");
+				}
 			}
+			return Result.fail("修改失败");
+		}catch (Exception e){
+			e.printStackTrace();
+			return Result.fail("修改失败");
 		}
-
-		return Result.fail("修改失败");
 	}
 
 	/**

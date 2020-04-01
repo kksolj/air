@@ -1,7 +1,7 @@
 package com.air.config;
 
 import com.air.modules.shiro.authc.MyRealm;
-import com.air.modules.shiro.authc.aop.ResourceCheckFilter;
+import com.air.modules.shiro.authc.aop.MyFilter;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
@@ -83,10 +83,12 @@ public class ShiroConfig {
 
 		// 添加自己的过滤器并且取名为jwt
 		Map<String, Filter> filterMap = new HashMap<String, Filter>(1);
-		filterMap.put("resourceCheckFilter", new ResourceCheckFilter());
+//		filterMap.put("resourceCheckFilter", new ResourceCheckFilter());
+		filterMap.put("my", new MyFilter());
 		shiroFilterFactoryBean.setFilters(filterMap);
 		// <!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边
 		//filterChainDefinitionMap.put("/**", "resourceCheckFilter");
+		filterChainDefinitionMap.put("/**", "my");
 
 		// 未授权界面;
 		shiroFilterFactoryBean.setUnauthorizedUrl("/403");

@@ -1,10 +1,13 @@
 package com.air.modules.shiro.authc;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import com.air.config.ApiContext;
 import com.air.modules.shiro.authc.util.JwtUtil;
 import com.alibaba.druid.util.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -31,6 +34,8 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author lee
  **/
@@ -48,6 +53,9 @@ public class MyRealm extends AuthorizingRealm {
     @Autowired
     private RedisUtil redisUtil;
 
+    private String token;
+
+
     private Logger log= LoggerFactory.getLogger(MyRealm.class);
 
 	/**
@@ -55,6 +63,7 @@ public class MyRealm extends AuthorizingRealm {
 	 */
 	@Override
 	public boolean supports(AuthenticationToken token) {
+		this.token = (String) token.getPrincipal();
 		return token instanceof MyToken;
 	}
 
@@ -75,16 +84,16 @@ public class MyRealm extends AuthorizingRealm {
 		// 设置该用户拥有角色
 		List<String> roles = null;
 		//从redis缓存中查询权限角色
-        String rolesStr = stringRedisTemplate.opsForValue().get(CommonConstant.PREFIX_USER_ROLE + username);
+        String rolesStr = stringRedisTemplate.opsForValue().get(CommonConstant.PREFIX_USER_ROLE + token);
         if (rolesStr != null) {
         	roles = JSON.parseArray(rolesStr.toString(), String.class);
         } else {
             //从数据库查询权限放到redis中
             roles = sysUserService.getRole(username);
-            stringRedisTemplate.opsForValue().set(CommonConstant.PREFIX_USER_ROLE + username, JSON.toJSONString(roles));
+            stringRedisTemplate.opsForValue().set(CommonConstant.PREFIX_USER_ROLE + token, JSON.toJSONString(roles));
         }
         //设置超时时间
-        stringRedisTemplate.expire(CommonConstant.PREFIX_USER_ROLE + username, CommonConstant.TOKEN_EXPIRE_TIME, TimeUnit.SECONDS);
+        stringRedisTemplate.expire(CommonConstant.PREFIX_USER_ROLE + token, CommonConstant.TOKEN_EXPIRE_TIME, TimeUnit.SECONDS);
 
 		/**
 		 * 设置该用户拥有的角色，比如“admin,test”
@@ -97,7 +106,17 @@ public class MyRealm extends AuthorizingRealm {
 
 		// 从数据库获取所有的权限
 		Set<String> permissionSet = new HashSet<>();
-		List<SysPermission> permissionList = sysPermissionService.queryByUser(username);
+		List<SysPermission> permissionList;
+		//查缓存
+		List<Object> objList = redisUtil.lGet(CommonConstant.PREFIX_USER_PERMISSION + token,0,-1);
+		if(objList != null && objList.size()>0){
+			permissionList = new ArrayList<>();
+			objList.stream().forEach(item->permissionList.addAll((List)item));
+		}else {
+			permissionList = sysPermissionService.queryByUser(username);
+			redisUtil.lSet(CommonConstant.PREFIX_USER_PERMISSION + token, permissionList);
+			redisUtil.expire(CommonConstant.PREFIX_USER_PERMISSION + token, CommonConstant.TOKEN_EXPIRE_TIME);
+		}
 		for (SysPermission po : permissionList) {
 			if (oConvertUtils.isNotEmpty(po.getUrl()) || oConvertUtils.isNotEmpty(po.getPerms())) {
 				if (oConvertUtils.isNotEmpty(po.getUrl())) {

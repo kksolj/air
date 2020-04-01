@@ -43,9 +43,6 @@ public class LoginController {
     private RedisUtil redisUtil;
 
     @Autowired
-    private ApiContext apiContext;
-
-    @Autowired
     private KeyGenerator keyGenerator;
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
@@ -97,6 +94,7 @@ public class LoginController {
             sysUser = sysUserService.getUserByName(username);
             token = String.valueOf(this.keyGenerator.generate(null, null, username));
             redisUtil.set(token,sysUser);
+            redisUtil.expire(token,CommonConstant.TOKEN_EXPIRE_TIME);
             if (sysUser == null) {
                 sysBaseAPI.addLog("登录失败，用户名:" + username + "不存在！", CommonConstant.LOG_TYPE_1, null);
                 return Result.fail("该用户不存在");

@@ -3,6 +3,7 @@ package com.air.modules.system.controller;
 import com.air.common.api.vo.Result;
 import com.air.common.util.PasswordUtil;
 import com.air.common.util.oConvertUtils;
+import com.air.modules.shiro.authc.util.AuthorizedUtil;
 import com.air.modules.shiro.authc.util.JwtUtil;
 import com.air.modules.system.entity.SysUser;
 import com.air.modules.system.entity.SysUserRole;
@@ -43,6 +44,9 @@ public class SysUserController {
 	@Autowired
 	private ISysUserRoleService sysUserRoleService;
 
+	@Autowired
+	private AuthorizedUtil authorizedUtil;
+
 	private Logger log= LoggerFactory.getLogger(SysUserController.class);
 
 	@GetMapping("/list")
@@ -74,9 +78,7 @@ public class SysUserController {
 
 		String selectedRoles = jsonObject.getString("selectedroles");
 		try {
-
-			String userId = JwtUtil.getUserToken(request, "userId");
-
+			SysUser sysUser = authorizedUtil.getUser(request);
 			SysUser user = JSON.parseObject(jsonObject.toJSONString(), SysUser.class);
 			user.setCreateTime(new Date());//设置创建时间
 			String salt = oConvertUtils.randomGen(8);
@@ -85,7 +87,7 @@ public class SysUserController {
 			user.setPassword(passwordEncode);
 			user.setStatus(1);
 			user.setIsDeleted("0");
-			user.setCreateBy(userId);
+			user.setCreateBy(sysUser.getId());
 			sysUserService.addUserWithRole(user, selectedRoles);
 			return Result.success("添加成功！");
 

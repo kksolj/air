@@ -3,13 +3,17 @@ package com.air.modules.system.controller;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
+import com.air.modules.shiro.authc.util.AuthorizedUtil;
 import com.air.modules.shiro.authc.util.JwtUtil;
 import com.air.modules.system.entity.SysAnnouncement;
+import com.air.modules.system.entity.SysUser;
 import com.air.modules.system.service.ISysAnnouncementService;
 import com.air.common.api.vo.Result;
 import com.air.common.constant.CommonConstant;
 import com.air.common.constant.CommonSendStatus;
 import com.air.common.util.oConvertUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -27,6 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 public class SysAnnouncementController {
 	@Autowired
 	private ISysAnnouncementService sysAnnouncementService;
+	@Autowired
+	private AuthorizedUtil authorizedUtil;
+
+	private Logger log = LoggerFactory.getLogger(SysAnnouncementController.class);
 
 	/**
 	  * 分页列表查询
@@ -176,22 +184,26 @@ public class SysAnnouncementController {
 	@GetMapping(value = "/doReleaseData")
 	public Result doReleaseData(@RequestParam(name="id",required=true) String id, HttpServletRequest request) {
 
-		SysAnnouncement sysAnnouncement = sysAnnouncementService.getById(id);
-		if (sysAnnouncement == null) {
-			return Result.fail("未找到对应实体！");
+		try{
+			SysUser user = authorizedUtil.getUser(request);
+			SysAnnouncement sysAnnouncement = sysAnnouncementService.getById(id);
+			if (sysAnnouncement == null) {
+				return Result.fail("未找到对应实体！");
 
-		} else {
-			sysAnnouncement.setSendStatus(CommonSendStatus.PUBLISHED_STATUS_1);//发布中
-			sysAnnouncement.setSendTime(new Date());
-			String userId = JwtUtil.getUserToken(request, "userId");
-			sysAnnouncement.setSender(userId);
-			boolean ok = sysAnnouncementService.updateById(sysAnnouncement);
-			if(ok) {
-				return Result.success("该系统通知发布成功");
+			} else {
+				sysAnnouncement.setSendStatus(CommonSendStatus.PUBLISHED_STATUS_1);//发布中
+				sysAnnouncement.setSendTime(new Date());
+				sysAnnouncement.setSender(user.getId());
+				boolean ok = sysAnnouncementService.updateById(sysAnnouncement);
+				if(ok) {
+					return Result.success("该系统通知发布成功");
+				}
 			}
+			return Result.fail("该系统通知发布失败");
+		}catch (Exception e){
+			e.printStackTrace();
+			return Result.fail("该系统通知发布失败");
 		}
-
-		return Result.fail("该系统通知发布失败");
 	}
 
 	/**

@@ -1,7 +1,9 @@
 package com.air.modules.system.controller;
 
+import com.air.modules.shiro.authc.util.AuthorizedUtil;
 import com.air.modules.shiro.authc.util.JwtUtil;
 import com.air.modules.system.entity.SysDept;
+import com.air.modules.system.entity.SysUser;
 import com.air.modules.system.model.DepartIdModel;
 import com.air.modules.system.model.SysDeptTreeModel;
 import com.air.modules.system.service.ISysDeptService;
@@ -9,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import com.air.common.api.vo.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +31,11 @@ public class SysDeptController {
 
 	@Autowired
 	private ISysDeptService sysDepartService;
+
+	@Autowired
+	private AuthorizedUtil authorizedUtil;
+
+	private Logger log= LoggerFactory.getLogger(SysDeptController.class);
 
 	/**
 	 * 查询数据 查出所有部门,并以树结构数据格式响应给前端
@@ -58,11 +67,10 @@ public class SysDeptController {
 	@RequiresRoles({"admin"})
 	public Result add(@RequestBody SysDept sysDept, HttpServletRequest request) {
 
-		String userId = JwtUtil.getUserToken(request, "userId");
 		try {
-
-			sysDept.setCreateBy(userId);
-			sysDepartService.saveDeptData(sysDept, userId);
+			SysUser user = authorizedUtil.getUser(request);
+			sysDept.setCreateBy(user.getId());
+			sysDepartService.saveDeptData(sysDept, user.getId());
 			return Result.success("添加成功！");
 
 		} catch (Exception e) {
@@ -84,16 +92,19 @@ public class SysDeptController {
 	@RequiresRoles({"admin"})
 	public Result edit(@RequestBody SysDept sysDepart, HttpServletRequest request) {
 
-		String userId = JwtUtil.getUserToken(request, "userId");
-		sysDepart.setUpdateBy(userId);
-
-		SysDept sysDepartEntity = sysDepartService.getById(sysDepart.getId());
-		if (sysDepartEntity == null) {
-			return Result.success("未找到对应实体");
-		} else {
-
-			sysDepartService.updateDeptDataById(sysDepart, userId);
-			return Result.fail("修改成功！");
+		try{
+			SysUser user = authorizedUtil.getUser(request);
+			sysDepart.setUpdateBy(user.getId());
+			SysDept sysDepartEntity = sysDepartService.getById(sysDepart.getId());
+			if (sysDepartEntity == null) {
+				return Result.success("未找到对应实体");
+			} else {
+				sysDepartService.updateDeptDataById(sysDepart, user.getId());
+				return Result.success("修改成功！");
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			return Result.fail("修改失败！");
 		}
 	}
 

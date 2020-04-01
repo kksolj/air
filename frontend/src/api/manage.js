@@ -1,4 +1,6 @@
 import { axios } from '@/utils/request'
+import Vue from 'vue'
+import {ACCESS_TOKEN} from "../store/mutation-types";
 
 const api = {
   user: '/api/user',
@@ -15,7 +17,10 @@ export function postAction(url,parameter) {
   return axios({
     url: url,
     method:'post' ,
-    data: parameter
+    data: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -24,7 +29,10 @@ export function httpAction(url,parameter,method) {
   return axios({
     url: url,
     method:method ,
-    data: parameter
+    data: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -33,7 +41,10 @@ export function putAction(url,parameter) {
   return axios({
     url: url,
     method:'put',
-    data: parameter
+    data: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -42,7 +53,10 @@ export function getAction(url,parameter) {
   return axios({
     url: url,
     method: 'get',
-    params: parameter
+    params: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -51,7 +65,10 @@ export function deleteAction(url,parameter) {
   return axios({
     url: url,
     method: 'delete',
-    params: parameter
+    params: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -59,7 +76,10 @@ export function getUserList(parameter) {
   return axios({
     url: api.user,
     method: 'get',
-    params: parameter
+    params: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -67,7 +87,10 @@ export function getRoleList(parameter) {
   return axios({
     url: api.role,
     method: 'get',
-    params: parameter
+    params: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -75,7 +98,10 @@ export function getServiceList(parameter) {
   return axios({
     url: api.service,
     method: 'get',
-    params: parameter
+    params: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -83,7 +109,10 @@ export function getPermissions(parameter) {
   return axios({
     url: api.permissionNoPager,
     method: 'get',
-    params: parameter
+    params: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -93,7 +122,10 @@ export function saveService(parameter) {
   return axios({
     url: api.service,
     method: parameter.id == 0 ? 'post' : 'put',
-    data: parameter
+    data: parameter,
+    headers:{
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
+    }
   })
 }
 
@@ -103,7 +135,8 @@ export function downFile(url,method){
     method: method,
     responseType: 'blob',
     headers: {
-      'Content-Type':'multipart/form-data'
+      'Content-Type':'multipart/form-data',
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
     }
   })
 }
@@ -115,7 +148,8 @@ export function uploadFile(url,method,data) {
     data: data,
     headers: {
       'Content-Type':'multipart/form-data,charset=utf-8,boundary=none',
-      'Content-Disposition':'attachment;filename=test.xls;name=import-excel'
+      'Content-Disposition':'attachment;filename=test.xls;name=import-excel',
+      'X-Access-Token': Vue.ls.get(ACCESS_TOKEN)
     }
   })
 }

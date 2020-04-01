@@ -37,6 +37,7 @@ public class SysPermissionServiceImpl extends ServiceImpl<SysPermissionMapper, S
 		return sysPermissionMapper.queryListByParentId(parentId);
 	}
 
+
 	/**
 	  * 真实删除
 	 */
