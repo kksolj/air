@@ -44,10 +44,10 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class MyRealm extends AuthorizingRealm {
 
-	@Autowired
-	private ISysPermissionService sysPermissionService;
-	@Autowired
-	private ISysUserService sysUserService;
+    @Autowired
+    private ISysPermissionService sysPermissionService;
+    @Autowired
+    private ISysUserService sysUserService;
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
@@ -56,37 +56,37 @@ public class MyRealm extends AuthorizingRealm {
     private String token;
 
 
-    private Logger log= LoggerFactory.getLogger(MyRealm.class);
+    private Logger log = LoggerFactory.getLogger(MyRealm.class);
 
-	/**
-	 * 必须重写此方法，不然Shiro会报错
-	 */
-	@Override
-	public boolean supports(AuthenticationToken token) {
-		this.token = (String) token.getPrincipal();
-		return token instanceof MyToken;
-	}
+    /**
+     * 必须重写此方法，不然Shiro会报错
+     */
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        this.token = (String) token.getPrincipal();
+        return token instanceof MyToken;
+    }
 
-	/**
-	 * 获取授权信息 Shiro中，只有当需要检测用户权限的时候才会调用此方法，例如checkRole,checkPermission之类的
-	 */
-	@Override
-	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		log.info("————权限认证 [ roles、permissions]————");
-		SysUser sysUser = null;
-		String username = null;
-		if(principals!=null) {
-			sysUser =  (SysUser) principals.getPrimaryPrincipal();
-			username = sysUser.getUsername();
-		}
+    /**
+     * 获取授权信息 Shiro中，只有当需要检测用户权限的时候才会调用此方法，例如checkRole,checkPermission之类的
+     */
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        log.info("————权限认证 [ roles、permissions]————");
+        SysUser sysUser = null;
+        String username = null;
+        if (principals != null) {
+            sysUser = (SysUser) principals.getPrimaryPrincipal();
+            username = sysUser.getUsername();
+        }
 
-		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-		// 设置该用户拥有角色
-		List<String> roles = null;
-		//从redis缓存中查询权限角色
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        // 设置该用户拥有角色
+        List<String> roles = null;
+        //从redis缓存中查询权限角色
         String rolesStr = stringRedisTemplate.opsForValue().get(CommonConstant.PREFIX_USER_ROLE + token);
         if (rolesStr != null) {
-        	roles = JSON.parseArray(rolesStr.toString(), String.class);
+            roles = JSON.parseArray(rolesStr.toString(), String.class);
         } else {
             //从数据库查询权限放到redis中
             roles = sysUserService.getRole(username);
@@ -95,101 +95,100 @@ public class MyRealm extends AuthorizingRealm {
         //设置超时时间
         stringRedisTemplate.expire(CommonConstant.PREFIX_USER_ROLE + token, CommonConstant.TOKEN_EXPIRE_TIME, TimeUnit.SECONDS);
 
-		/**
-		 * 设置该用户拥有的角色，比如“admin,test”
-		 */
-		info.setRoles(new HashSet<>(roles));
+        /**
+         * 设置该用户拥有的角色，比如“admin,test”
+         */
+        info.setRoles(new HashSet<>(roles));
 
 //		// TODO 测试数据
 //		String permissions = "sys:role:update2,sys:role:add,/sys/user/add";
 //		Set<String> permission = new HashSet<>(Arrays.asList(permissions.split(",")));
 
-		// 从数据库获取所有的权限
-		Set<String> permissionSet = new HashSet<>();
-		List<SysPermission> permissionList;
-		//查缓存
-		List<Object> objList = redisUtil.lGet(CommonConstant.PREFIX_USER_PERMISSION + token,0,-1);
-		if(objList != null && objList.size()>0){
-			permissionList = new ArrayList<>();
-			objList.stream().forEach(item->permissionList.addAll((List)item));
-		}else {
-			permissionList = sysPermissionService.queryByUser(username);
-			redisUtil.lSet(CommonConstant.PREFIX_USER_PERMISSION + token, permissionList);
-			redisUtil.expire(CommonConstant.PREFIX_USER_PERMISSION + token, CommonConstant.TOKEN_EXPIRE_TIME);
-		}
-		for (SysPermission po : permissionList) {
-			if (oConvertUtils.isNotEmpty(po.getUrl()) || oConvertUtils.isNotEmpty(po.getPerms())) {
-				if (oConvertUtils.isNotEmpty(po.getUrl())) {
-					permissionSet.add(po.getUrl());
-				} else if (oConvertUtils.isNotEmpty(po.getPerms())) {
-					permissionSet.add(po.getPerms());
-				}
+        // 从数据库获取所有的权限
+        Set<String> permissionSet = new HashSet<>();
+        List<SysPermission> permissionList;
+        //查缓存
+        Object obj = redisUtil.get(CommonConstant.PREFIX_USER_PERMISSION + token);
+        if (obj != null && obj instanceof List) {
+            permissionList = (List) obj;
+        } else {
+            permissionList = sysPermissionService.queryByUser(username);
+            redisUtil.set(CommonConstant.PREFIX_USER_PERMISSION + token, permissionList);
+            redisUtil.expire(CommonConstant.PREFIX_USER_PERMISSION + token, CommonConstant.TOKEN_EXPIRE_TIME);
+        }
+        for (SysPermission po : permissionList) {
+            if (oConvertUtils.isNotEmpty(po.getUrl()) || oConvertUtils.isNotEmpty(po.getPerms())) {
+                if (oConvertUtils.isNotEmpty(po.getUrl())) {
+                    permissionSet.add(po.getUrl());
+                } else if (oConvertUtils.isNotEmpty(po.getPerms())) {
+                    permissionSet.add(po.getPerms());
+                }
 
-			}
-		}
+            }
+        }
 
-		info.addStringPermissions(permissionSet);
-		return info;
-	}
+        info.addStringPermissions(permissionSet);
+        return info;
+    }
 
-	/**
-	 * 获取身份验证信息 Shiro中，默认使用此方法进行用户名正确与否验证，错误抛出异常即可。
-	 *
-	 * @param auth 用户身份信息 token
-	 * @return 返回封装了用户信息的 AuthenticationInfo 实例
-	 */
-	@Override
-	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken auth) throws AuthenticationException {
-		log.debug("————身份认证方法————");
-		String token = (String) auth.getCredentials();
-		if (StringUtils.isEmpty(token)) {
-			throw new AuthenticationException("token为空!");
-		}
-		//对比redis中数据进行校验
-		SysUser sysUser = (SysUser)redisUtil.get(token);
-		if (sysUser == null) {
-			throw new AuthenticationException("token非法无效，请重新登录!");
-		}
+    /**
+     * 获取身份验证信息 Shiro中，默认使用此方法进行用户名正确与否验证，错误抛出异常即可。
+     *
+     * @param auth 用户身份信息 token
+     * @return 返回封装了用户信息的 AuthenticationInfo 实例
+     */
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken auth) throws AuthenticationException {
+        log.debug("————身份认证方法————");
+        String token = (String) auth.getCredentials();
+        if (StringUtils.isEmpty(token)) {
+            throw new AuthenticationException("token为空!");
+        }
+        //对比redis中数据进行校验
+        SysUser sysUser = (SysUser) redisUtil.get(token);
+        if (sysUser == null) {
+            throw new AuthenticationException("token非法无效，请重新登录!");
+        }
 
-		// 判断用户状态
-		if (sysUser.getStatus() != 1) {
-			throw new AuthenticationException("账号已被锁定,请联系管理员!");
-		}
+        // 判断用户状态
+        if (sysUser.getStatus() != 1) {
+            throw new AuthenticationException("账号已被锁定,请联系管理员!");
+        }
 
-		return new SimpleAuthenticationInfo(sysUser, token, getName());
-	}
+        return new SimpleAuthenticationInfo(sysUser, token, getName());
+    }
 
 
-	/**
-	 * JWTToken刷新生命周期 1、登录成功后将用户的JWT生成的Token作为k、v存储到cache缓存里面(这时候k、v值一样)
-	 * 2、当该用户再次请求时，通过JWTFilter层层校验之后会进入到doGetAuthenticationInfo进行身份验证
-	 * 3、当该用户这次请求JWTToken值还在生命周期内，则会通过重新PUT的方式k、v都为Token值，缓存中的token值生命周期时间重新计算(这时候k、v值一样)
-	 * 4、当该用户这次请求jwt生成的token值已经超时，但该token对应cache中的k还是存在，则表示该用户一直在操作只是JWT的token失效了，程序会给token对应的k映射的v值重新生成JWTToken并覆盖v值，该缓存生命周期重新计算
-	 * 5、当该用户这次请求jwt在生成的token值已经超时，并在cache中不存在对应的k，则表示该用户账户空闲超时，返回用户信息已失效，请重新登录。
-	 * 6、每次当返回为true情况下，都会给Response的Header中设置Authorization，该Authorization映射的v为cache对应的v值。
-	 * 7、注：当前端接收到Response的Header中的Authorization值会存储起来，作为以后请求token使用
-	 *
-	 * @param userId
-	 * @param passWord
-	 * @return
-	 */
-	public boolean jwtTokenRefresh(String token, String userId, String userName, String passWord) {
-		String cacheToken = String.valueOf(redisUtil.get(CommonConstant.PREFIX_USER_TOKEN + token));
-		if (oConvertUtils.isNotEmpty(cacheToken)) {
-			//校验token有效性
-			if (!JwtUtil.verify(token, userId, passWord)) {
-				String newAuthorization = JwtUtil.sign(userId, userName, passWord);
-				redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, newAuthorization);
-				 //设置超时时间
-				redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME/1000);
-			} else {
-				redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, cacheToken);
-				 //设置超时时间
-				redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME/1000);
-			}
-			return true;
-		}
-		return false;
-	}
+    /**
+     * JWTToken刷新生命周期 1、登录成功后将用户的JWT生成的Token作为k、v存储到cache缓存里面(这时候k、v值一样)
+     * 2、当该用户再次请求时，通过JWTFilter层层校验之后会进入到doGetAuthenticationInfo进行身份验证
+     * 3、当该用户这次请求JWTToken值还在生命周期内，则会通过重新PUT的方式k、v都为Token值，缓存中的token值生命周期时间重新计算(这时候k、v值一样)
+     * 4、当该用户这次请求jwt生成的token值已经超时，但该token对应cache中的k还是存在，则表示该用户一直在操作只是JWT的token失效了，程序会给token对应的k映射的v值重新生成JWTToken并覆盖v值，该缓存生命周期重新计算
+     * 5、当该用户这次请求jwt在生成的token值已经超时，并在cache中不存在对应的k，则表示该用户账户空闲超时，返回用户信息已失效，请重新登录。
+     * 6、每次当返回为true情况下，都会给Response的Header中设置Authorization，该Authorization映射的v为cache对应的v值。
+     * 7、注：当前端接收到Response的Header中的Authorization值会存储起来，作为以后请求token使用
+     *
+     * @param userId
+     * @param passWord
+     * @return
+     */
+    public boolean jwtTokenRefresh(String token, String userId, String userName, String passWord) {
+        String cacheToken = String.valueOf(redisUtil.get(CommonConstant.PREFIX_USER_TOKEN + token));
+        if (oConvertUtils.isNotEmpty(cacheToken)) {
+            //校验token有效性
+            if (!JwtUtil.verify(token, userId, passWord)) {
+                String newAuthorization = JwtUtil.sign(userId, userName, passWord);
+                redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, newAuthorization);
+                //设置超时时间
+                redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME / 1000);
+            } else {
+                redisUtil.set(CommonConstant.PREFIX_USER_TOKEN + token, cacheToken);
+                //设置超时时间
+                redisUtil.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtil.EXPIRE_TIME / 1000);
+            }
+            return true;
+        }
+        return false;
+    }
 
 }

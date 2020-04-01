@@ -96,13 +96,12 @@ public class SysPermissionController {
             String username = req.getParameter("username");
             String token = req.getHeader(DefContants.X_ACCESS_TOKEN);
             List<SysPermission> metaList;
-            List<Object> objList = redisUtil.lGet(CommonConstant.PREFIX_USER_PERMISSION + token, 0, -1);
-            if (objList != null && objList.size() > 0) {
-                metaList = new ArrayList<SysPermission>();
-                objList.forEach(item -> metaList.addAll((List) item));
+            Object obj = redisUtil.get(CommonConstant.PREFIX_USER_PERMISSION + token);
+            if (obj != null && obj instanceof List) {
+                metaList = (List)obj;
             } else {
                 metaList = sysPermissionService.queryByUser(username);
-                redisUtil.lSet(CommonConstant.PREFIX_USER_PERMISSION + token, metaList);
+                redisUtil.set(CommonConstant.PREFIX_USER_PERMISSION + token, metaList);
             }
             JSONArray jsonArray = new JSONArray();
             this.getPermissionJsonArray(jsonArray, metaList, null);
@@ -119,7 +118,9 @@ public class SysPermissionController {
     public Result add(@RequestBody SysPermission permission, HttpServletRequest request) {
 
         try {
+            String token =request.getHeader(DefContants.X_ACCESS_TOKEN);
             SysUser user = authorizedUtil.getUser(request);
+            redisUtil.del(CommonConstant.PREFIX_USER_PERMISSION + token);
             sysPermissionService.addPermission(permission, user.getId());
             return Result.success("添加成功！");
         } catch (Exception e) {
@@ -134,7 +135,9 @@ public class SysPermissionController {
     public Result edit(@RequestBody SysPermission permission, HttpServletRequest request) {
 
         try {
+            String token =request.getHeader(DefContants.X_ACCESS_TOKEN);
             SysUser user = authorizedUtil.getUser(request);
+            redisUtil.del(CommonConstant.PREFIX_USER_PERMISSION + token);
             sysPermissionService.editPermission(permission, user.getId());
             return Result.success("修改成功！");
         } catch (Exception e) {
@@ -146,9 +149,11 @@ public class SysPermissionController {
 
     @DeleteMapping("/delete")
     @RequiresRoles({"admin"})
-    public Result delete(@RequestParam(name = "id") String id) {
+    public Result delete(@RequestParam(name = "id") String id, HttpServletRequest request) {
 
         try {
+            String token =request.getHeader(DefContants.X_ACCESS_TOKEN);
+            redisUtil.del(CommonConstant.PREFIX_USER_PERMISSION + token);
             sysPermissionService.deletePermission(id);
             return Result.success("删除成功！");
 

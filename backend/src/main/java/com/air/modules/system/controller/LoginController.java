@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 登录
+ *
  * @author lee
  */
 @RestController
@@ -50,6 +51,8 @@ public class LoginController {
     public Result loginOut(HttpServletRequest request) {
         String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
         redisUtil.del(token);
+        redisUtil.del(CommonConstant.PREFIX_USER_PERMISSION + token);
+        redisUtil.del(CommonConstant.PREFIX_USER_ROLE + token);
         return Result.success("退出成功");
     }
 
@@ -93,8 +96,8 @@ public class LoginController {
             //token为空，根据username查询用户，并校验密码，向前端提供token
             sysUser = sysUserService.getUserByName(username);
             token = String.valueOf(this.keyGenerator.generate(null, null, username));
-            redisUtil.set(token,sysUser);
-            redisUtil.expire(token,CommonConstant.TOKEN_EXPIRE_TIME);
+            redisUtil.set(token, sysUser);
+            redisUtil.expire(token, CommonConstant.TOKEN_EXPIRE_TIME);
             if (sysUser == null) {
                 sysBaseAPI.addLog("登录失败，用户名:" + username + "不存在！", CommonConstant.LOG_TYPE_1, null);
                 return Result.fail("该用户不存在");
@@ -115,23 +118,24 @@ public class LoginController {
         }
     }
 
-	/**
-	 * 获取访问量
-	 * @return
-	 */
-	@GetMapping("loginfo")
-	public Result loginfo() {
+    /**
+     * 获取访问量
+     *
+     * @return
+     */
+    @GetMapping("loginfo")
+    public Result loginfo() {
 
-		JSONObject obj = new JSONObject();
-		// 获取系统访问记录
-		Long totalVisitCount = logService.findTotalVisitCount();
-		obj.put("totalVisitCount", totalVisitCount);
-		Long todayVisitCount = logService.findTodayVisitCount();
-		obj.put("todayVisitCount", todayVisitCount);
-		Long todayIp = logService.findTodayIp();
-		obj.put("todayIp", todayIp);
+        JSONObject obj = new JSONObject();
+        // 获取系统访问记录
+        Long totalVisitCount = logService.findTotalVisitCount();
+        obj.put("totalVisitCount", totalVisitCount);
+        Long todayVisitCount = logService.findTodayVisitCount();
+        obj.put("todayVisitCount", todayVisitCount);
+        Long todayIp = logService.findTodayIp();
+        obj.put("todayIp", todayIp);
 
-		return Result.success(obj);
-	}
+        return Result.success(obj);
+    }
 
 }
