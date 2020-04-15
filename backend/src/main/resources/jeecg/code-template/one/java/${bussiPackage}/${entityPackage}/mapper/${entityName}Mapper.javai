@@ -1,8 +1,5 @@
 package ${bussiPackage}.${entityPackage}.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
 import ${bussiPackage}.${entityPackage}.entity.${entityName};
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -13,5 +10,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @version： V1.0
  */
 public interface ${entityName}Mapper extends BaseMapper<${entityName}> {
-    List<${entityName}> getAll();
+
 }

@@ -37,7 +37,6 @@ public class ${entityName}Controller {
 	@Autowired
 	private I${entityName}Service ${entityName?uncap_first}Service;
 
-	private Logger log= LoggerFactory.getLogger(${entityName}Controller.class);
 
 	/**
 	 * 分页列表查询
@@ -90,7 +89,7 @@ public class ${entityName}Controller {
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.info(e.getMessage());
-	    	return	Result.fail("数据已存在");
+	    	return	Result.fail("添加失败！");
 		}
 	}
 
@@ -101,18 +100,22 @@ public class ${entityName}Controller {
 	 */
     @ApiOperation(value="${tableVo.ftlDescription}-编辑", notes="${tableVo.ftlDescription}-编辑")
     @PutMapping(value = "/edit")
-	public Result eidt(@RequestBody ${entityName} ${entityName?uncap_first}) {
-		${entityName} ${entityName?uncap_first}Entity = ${entityName?uncap_first}Service.getById(${entityName?uncap_first}.getId());
-		if(${entityName?uncap_first}Entity==null) {
-		     return	 Result.fail("未找到对应实体");
-		}else {
-			boolean ok = ${entityName?uncap_first}Service.updateById(${entityName?uncap_first});
-			//TODO 返回false说明什么？
-			if(ok) {
-			return	Result.success("修改成功!");
-			}
-			return	Result.fail("数据已存在");
-		}
+	public Result edit(@RequestBody ${entityName} ${entityName?uncap_first}) {
+	    try {
+            ${entityName} ${entityName?uncap_first}Entity = ${entityName?uncap_first}Service.getById(${entityName?uncap_first}.getId());
+            if(${entityName?uncap_first}Entity==null) {
+                 return	 Result.fail("未找到对应实体");
+            }else {
+                boolean ok = ${entityName?uncap_first}Service.updateById(${entityName?uncap_first});
+                if(ok) {
+                return	Result.success("修改成功!");
+                }
+                return	Result.fail("修改失败!");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.fail("修改失败");
+        }
 	}
 
 	/**
@@ -123,16 +126,21 @@ public class ${entityName}Controller {
     @ApiOperation(value="${tableVo.ftlDescription}-通过id删除", notes="${tableVo.ftlDescription}-通过id删除")
 	@DeleteMapping(value = "/delete")
 	public Result delete(@RequestParam(name="id",required=true) String id) {
-		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
-		if(${entityName?uncap_first}==null) {
-		     return	Result.fail("未找到对应实体");
-		}else {
-			boolean ok = ${entityName?uncap_first}Service.removeById(id);
-			if(ok) {
-			 return	Result.success("删除成功!");
-			}
-			 return	Result.fail("删除失败!");
-		}
+	    try {
+            ${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
+            if(${entityName?uncap_first}==null) {
+                 return	Result.fail("未找到对应实体");
+            }else {
+                boolean ok = ${entityName?uncap_first}Service.removeById(id);
+                if(ok) {
+                 return	Result.success("删除成功!");
+                }
+                 return	Result.fail("删除失败!");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return Result.fail("删除失败!");
+        }
 	}
 
 	/**
@@ -143,31 +151,35 @@ public class ${entityName}Controller {
     @ApiOperation(value="${tableVo.ftlDescription}-批量删除", notes="${tableVo.ftlDescription}-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		if(ids==null || "".equals(ids.trim())) {
-		    return Result.fail("参数不识别！");
-		}else {
-			this.${entityName?uncap_first}Service.removeByIds(Arrays.asList(ids.split(",")));
-		    return Result.success("删除成功!");
-		}
+        try {
+            if(ids==null || "".equals(ids.trim())) {
+                return Result.fail("参数不识别！");
+            }else {
+                this.${entityName?uncap_first}Service.removeByIds(Arrays.asList(ids.split(",")));
+                return Result.success("删除成功!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.fail("删除失败!");
+        }
 	}
 
 	/**
 	 * 通过id查询
-	 * @param id
+	 * @param jsonObject
 	 * @return
 	 */
     @ApiOperation(value="${tableVo.ftlDescription}-通过id查询", notes="${tableVo.ftlDescription}-通过id查询")
-	@GetMapping(value = "/queryById")
-	public Result<${entityName}> queryById(@RequestParam(name="id",required=true) String id) {
+	@PostMapping(value = "/queryById")
+	public Result queryById(@RequestBody JSONObject jsonObject) {
+	    String id = jsonObject.getString("id");
 		Result<${entityName}> result = new Result<${entityName}>();
 		${entityName} ${entityName?uncap_first} = ${entityName?uncap_first}Service.getById(id);
 		if(${entityName?uncap_first}==null) {
-			result.fail("未找到对应实体");
+            return Result.fail("未找到对应实体");
 		}else {
-			result.setData(${entityName?uncap_first});
-			result.setSuccess(true);
+			return Result.success(${entityName?uncap_first});
 		}
-		return result;
 	}
 
     /**
@@ -189,8 +201,26 @@ public class ${entityName}Controller {
     */
     @RequestMapping(value = "/exportExcel")
     public void exportExcel(HttpServletResponse response) {
-        List<${entityName}> ${entityName?uncap_first}List = ${entityName?uncap_first}Service.getAll();
+        List<${entityName}> ${entityName?uncap_first}List = ${entityName?uncap_first}Service.list();
         ExcelUtils.exportExcel(${entityName?uncap_first}List, null, "${tableVo.ftlDescription}", ${entityName}.class, "${tableVo.ftlDescription}.xls", true, response);
+    }
+
+    /**
+     * 批量导出excel
+     *
+     * @param response
+     */
+    @RequestMapping(value = "/batchExport")
+    public void batchExport(HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        try{
+            String ids = jsonObject.getString("ids");
+            String[] idArr = ids.trim().split(",");
+            List<String> idList = Arrays.asList(idArr);
+            List<${entityName}> ${entityName?uncap_first}List = (List<${entityName}>)${entityName?uncap_first}Service.listByIds(idList);
+            ExcelUtils.exportExcel(${entityName?uncap_first}List, null, "报表", ${entityName}.class, "报表.xls", true, response);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

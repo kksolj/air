@@ -14,5 +14,4 @@ public interface I${entityName}Service extends IService<${entityName}> {
 
   void importExcel(List<${entityName}> ${entityName}List);
 
-  List<${entityName}> getAll();
 }

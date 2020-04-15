@@ -33,7 +33,8 @@
 
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
+            <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
+            <a-menu-item key="2" @click="batchExport"><a-icon type="file"/>导出至Excel</a-menu-item>
         </a-menu>
         <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
       </a-dropdown>
@@ -41,7 +42,7 @@
 
     <!-- 报表导入导出功能 -->
     <div>
-      <a-button type="primary" @click="exportExcel">导出Excel文件</a-button>
+      <a-button type="primary" @click="exportExcel">导出所有至Excel文件</a-button>
     </div>
 
     <div>
@@ -105,8 +106,6 @@
   import { filterObj } from '@/utils/util'
   import { deleteAction,getAction } from '@/api/manage'
   import { downFile } from '@/api/manage'
-  import Vue from 'vue'
-  import { ACCESS_TOKEN } from "@/store/mutation-types"
   import {doMian} from '@/api/api'
 
 
@@ -132,15 +131,15 @@
               return parseInt(index)+1;
             }
           },
-          <#list columns as po>
-           <#if po.fieldName !='id'>
-		  {
+            <#list columns as po>
+            <#if po.fieldName !='id'>
+            {
             title: '${po.filedComment}',
             align:"center",
             dataIndex: '${po.fieldName}'
-          },
-		   </#if>
-		  </#list>
+            },
+            </#if>
+            </#list>
           {
             title: '操作',
             dataIndex: 'action',
@@ -173,16 +172,14 @@
           list: "/${entityPackage}/${entityName?uncap_first}/list",
           delete: "/${entityPackage}/${entityName?uncap_first}/delete",
           deleteBatch: "/${entityPackage}/${entityName?uncap_first}/deleteBatch",
-          downfile: "/demoexcel/demoExcel/exportExcel",
-          uploadFile: doMian + "/demoexcel/demoExcel/importExcel"
+          batchExport: "/${entityPackage}/${entityName?uncap_first}/batchExport",
+          downfile: "/${entityPackage}/${entityName?uncap_first}/exportExcel",
+          uploadFile: doMian + "/${entityPackage}/${entityName?uncap_first}/importExcel"
         },
-        headers: {}
       }
     },
     created() {
       this.loadData();
-      const token = Vue.ls.get(ACCESS_TOKEN);
-      this.headers = {"X-Access-Token":token}
     },
     computed: {
         uploadAction: function () {
@@ -260,6 +257,47 @@
             }
           });
         }
+      },
+      batchExport: function(){
+          if(this.selectedRowKeys.length<=0){
+              this.$message.warning('请选择一条记录！');
+              return;
+          }
+          let that = this;
+          this.$confirm({
+              title:"导出数据",
+              content:"是否导出选中记录?",
+              onOk: function(){
+                  let ids = "";
+                  for(let a =0;a<that.selectedRowKeys.length;a++){
+                      ids+=that.selectedRowKeys[a]+",";
+                  }
+                  downFile(that.url.batchExport,'POST',{ids:ids})
+                      .then((res)=>{
+                          if(!res){
+                              this.$message.warning('文件下载失败!')
+                              return
+                          }
+                          if(typeof window.navigator.msSaveBlob!=='undefined'){
+                              window.navigator.msSaveBlob(new Blob([res]),'表单'+new Date().toLocaleDateString()+'.xls')
+                          }else{
+                              let url=window.URL.createObjectURL(new Blob([res]))
+                              let link = document.createElement('a')
+                              link.style.display='none'
+                              link.href=url
+                              link.setAttribute('download','表单'+new Date().toLocaleDateString()+'.xls')
+                              document.body.appendChild(link)
+                              link.click()
+                              document.body.removeChild(link) //移除元素
+                              window.URL.revokeObjectURL(url) //释放blob对象
+                          }
+                      },(res)=>{
+                          console.log(res)
+                          this.$message.warning('下载失败!')
+                          return
+                      })
+              }
+          });
       },
       handleDelete: function(id){
         var that = this;

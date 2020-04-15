@@ -22,14 +22,10 @@ public class ${entityName}ServiceImpl extends ServiceImpl<${entityName}Mapper, $
     private ${entityName}Mapper ${entityName?uncap_first}Mapper;
 
     @Override
-    public void importExcel(List<${entityName}> ${entityName}List) {
-        for (${entityName} item : ${entityName}List) {
+    public void importExcel(List<${entityName}> ${entityName?uncap_first}List) {
+        for (${entityName} item : ${entityName?uncap_first}List) {
             ${entityName?uncap_first}Mapper.insert(item);
         }
     }
 
-    @Override
-    public List<${entityName}> getAll() {
-        return ${entityName?uncap_first}Mapper.getAll();
-    }
 }
